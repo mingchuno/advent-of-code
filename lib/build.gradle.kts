@@ -20,7 +20,7 @@ repositories {
 }
 
 dependencies {
-// Align versions of all Kotlin components
+    // Align versions of all Kotlin components
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("com.google.guava:guava:32.1.1-jre")
     // Use the Kotlin JDK 8 standard library.
@@ -38,8 +38,4 @@ tasks.withType<Test>().configureEach { useJUnitPlatform() }
 spotless { kotlin { ktfmt("0.46").kotlinlangStyle() } }
 
 // Apply a specific Java toolchain to ease working on different environments.
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(17))
-    }
-}
+java { toolchain { languageVersion.set(JavaLanguageVersion.of(17)) } }
