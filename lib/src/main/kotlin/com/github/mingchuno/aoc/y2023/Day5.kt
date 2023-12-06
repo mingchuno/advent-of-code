@@ -162,6 +162,7 @@ fun List<Mapping>.fillTheGap(): List<Mapping> {
             rangeLength = Long.MAX_VALUE - rightMost.sourceEnd
         )
     )
+    // Need to perform filter because 2 range may be continuous and no gap in between
     return mappings.filter { it.rangeLength != 0L }.sortedBy { it.sourceStart }
 }
 
