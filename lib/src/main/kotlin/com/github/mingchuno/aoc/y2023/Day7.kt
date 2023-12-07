@@ -16,72 +16,56 @@ object Day7 : Problem<Int> {
     override fun computePart2(inputFile: String): Int {
         val inputs = inputFile.readFileFromResource()
         val hands = parseInputs(inputs)
-        return hands.sortedWith { a, b -> a.comparePart2(b) }.onEach { println(it) }.winnings()
+        return hands.sortedWith { a, b -> a.comparePart2(b) }.winnings()
     }
 }
 
 private fun List<Hand>.winnings(): Int = mapIndexed { index, hand -> (index + 1) * hand.bid }.sum()
 
+private const val FIVE_OF_A_KIND = 6
+private const val FOURTH_OF_A_KIND = 5
+private const val FULL_HOUSE = 4
+private const val THREE_OF_A_KIND = 3
+private const val TWO_PAIRS = 2
+private const val ONE_PAIR = 1
+private const val HIGH_CARD = 0
+
 data class Hand(val hand: String, val bid: Int) {
     private val _map: Map<Char, Int> = hand.groupBy { it }.mapValues { (_, v) -> v.size }
+    private val _mapValues = _map.values
     private val _mapWithoutJ = _map.filterNot { (k, _) -> k == 'J' }
-    private val isFiveOfAKind = _map.values.contains(5)
-    private val isFourthOfAKind = _map.values.contains(4)
-    private val isFullHouse = _map.size == 2 && _map.values.contains(2) && _map.values.contains(3)
-    private val isThreeOfAKind =
-        _map.values.filter { it == 3 }.size == 1 && !_map.values.contains(2)
-    private val isTwoPairs = _map.values.filter { it == 2 }.size == 2
-    private val isOnePair =
-        _map.values.filter { it == 2 }.size == 1 /* have a pair */ &&
-            !_map.values.any { it >= 3 } /* and don't have full house or above */
-    private val highCard = _map.values.all { it == 1 }
+    private val _mapWithoutJValues = _mapWithoutJ.values
 
-    val rankNumber =
-        if (isFiveOfAKind) {
-            6
-        } else if (isFourthOfAKind) {
-            5
-        } else if (isFullHouse) {
-            4
-        } else if (isThreeOfAKind) {
-            3
-        } else if (isTwoPairs) {
-            2
-        } else if (isOnePair) {
-            1
-        } else if (highCard) {
-            0
-        } else {
-            throw Exception("unknown hand:$hand")
-        }
+    val rankNumber: Int =
+        if (_mapValues.contains(5)) FIVE_OF_A_KIND
+        else if (_mapValues.contains(4)) FOURTH_OF_A_KIND
+        else if (_mapValues.contains(2) && _mapValues.contains(3)) FULL_HOUSE
+        else if (_mapValues.filter { it == 3 }.size == 1) THREE_OF_A_KIND
+        else if (_mapValues.filter { it == 2 }.size == 2) TWO_PAIRS
+        else if (_mapValues.filter { it == 2 }.size == 1) ONE_PAIR
+        else if (_mapValues.all { it == 1 }) HIGH_CARD else throw Exception("unknown hand:$hand")
 
     val part2RankNumber: Int by lazy {
         val jokerCount = hand.count { it == 'J' }
         when (jokerCount) {
             0 -> rankNumber
-            5 -> 6
-            4 -> 6
-            3 -> if (_mapWithoutJ.values.any { it == 2 }) 6 else 5
+            5 -> FIVE_OF_A_KIND
+            4 -> FIVE_OF_A_KIND
+            3 ->
+                if (_mapWithoutJValues.any { it == 2 }) FIVE_OF_A_KIND /*3,2*/
+                else FOURTH_OF_A_KIND /*3,1,1*/
             2 ->
-                if (_mapWithoutJ.values.any { it == 3 }) {
-                    6
-                } else if (_mapWithoutJ.values.any { it == 2 }) {
-                    5
-                } else if (_mapWithoutJ.values.all { it == 1 }) 3 else 4
+                if (_mapWithoutJValues.any { it == 3 }) FIVE_OF_A_KIND /*2,3*/
+                else if (_mapWithoutJValues.any { it == 2 }) FOURTH_OF_A_KIND /*2,2,1*/
+                else if (_mapWithoutJValues.all { it == 1 }) THREE_OF_A_KIND /*2,1,1,1*/
+                else throw Exception("unknown hand:$hand")
             1 ->
-                if (_mapWithoutJ.values.any { it == 4 }) {
-                    6
-                } else if (_mapWithoutJ.values.any { it == 3 }) {
-                    5
-                } else if (_mapWithoutJ.values.all { it == 2 }) {
-                    4
-                } else if (_mapWithoutJ.values.any { it == 2 }) {
-                    3
-                } else if (_mapWithoutJ.values.all { it == 1 }) {
-                    1
-                } else {
-                    throw Exception("unknown hand:$hand")
-                }
+                if (_mapWithoutJValues.any { it == 4 }) FIVE_OF_A_KIND /*1,4*/
+                else if (_mapWithoutJValues.any { it == 3 }) FOURTH_OF_A_KIND /*1,3,1*/
+                else if (_mapWithoutJValues.all { it == 2 }) FULL_HOUSE /*1,2,2*/
+                else if (_mapWithoutJValues.any { it == 2 }) THREE_OF_A_KIND /*1,2,1,1*/
+                else if (_mapWithoutJValues.all { it == 1 }) ONE_PAIR /*1,1,1,1,1*/
+                else throw Exception("unknown hand:$hand")
             else -> throw Exception("unknown hand:$hand")
         }
     }
