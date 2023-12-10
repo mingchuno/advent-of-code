@@ -10,7 +10,8 @@ object Day10 : Problem<Int> {
     }
 
     override fun computePart2(inputFile: String): Int {
-        TODO("Not yet implemented")
+        val inputs = inputFile.readFileFromResource()
+        return DFS(inputs).runPart2()
     }
 
     private fun Char.`in`(vararg chars: Char): Boolean = chars.contains(this)
@@ -42,10 +43,62 @@ object Day10 : Problem<Int> {
         private val startingPos = findStartingPos(inputs)
         private val startingChar = decideStartingChar(inputs, startingPos)
         private val realInput = inputs.assumePipe(startingPos, startingChar)
+        private val visited = initVisited(inputs)
+
+        private fun initVisited(inputs: List<String>): MutableList<MutableList<Boolean>> =
+            inputs.map { input -> input.map { false }.toMutableList() }.toMutableList()
 
         fun run(): Int {
             val nextDirection = startingChar.nextDirection().first()
             return dfs(nextDirection.toPos(startingPos), steps = 1, nextDirection) / 2
+        }
+
+        fun runPart2(): Int {
+            run()
+            val areaMap = cleanInputs(realInput)
+            for (x in 0 ..< X) {
+                for (y in 0 ..< Y) {
+                    if (areaMap[y][x] == GROUND) {
+                        // decide if it is `I` or `O` by odd/even
+                        val isPosInside = isInside(x, y, areaMap)
+                        // Then, use DFS again to fill the partial area map
+                        fillAreaWith(x, y, if (isPosInside) 'I' else 'O', areaMap)
+                    }
+                }
+            }
+            return areaMap.sumOf { it.count { char -> char == 'I' } }
+        }
+
+        private fun isInside(x: Int, y: Int, areaMap: List<List<Char>>): Boolean {
+            var count = 0
+            for (smallX in 0 ..< x) {
+                if (areaMap[y][smallX].`in`(VERTICAL, F, `7`)) {
+                    count++
+                }
+            }
+            return count.mod(2) == 1
+        }
+
+        private fun fillAreaWith(
+            x: Int,
+            y: Int,
+            fill: Char,
+            areaMap: MutableList<MutableList<Char>>
+        ) {
+            if (areaMap[y][x] == GROUND) {
+                areaMap[y][x] = fill
+                listOf(x to y - 1, x + 1 to y, x - 1 to y, x to y + 1)
+                    .filter { validXY(it) }
+                    .forEach { fillAreaWith(it.first, it.second, fill, areaMap) }
+            }
+        }
+
+        private fun cleanInputs(inputs: List<String>): MutableList<MutableList<Char>> {
+            return inputs
+                .mapIndexed { y, input ->
+                    input.mapIndexed { x, c -> if (visited[y][x]) c else GROUND }.toMutableList()
+                }
+                .toMutableList()
         }
 
         private fun validXY(it: Pair<Int, Int>): Boolean {
@@ -92,13 +145,13 @@ object Day10 : Problem<Int> {
             }
         }
 
-        // init with step = 1, pos = first pipe next to S, previousDirection => S
         private tailrec fun dfs(
             pos: Pair<Int, Int>,
             steps: Int,
             previousDirection: Direction
         ): Int {
             val (x, y) = pos
+            visited[y][x] = true
             if (pos == startingPos) {
                 println("arrive starting pos again:$pos with steps=$steps")
                 return steps // back to starting pos again
