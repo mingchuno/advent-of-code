@@ -1,0 +1,159 @@
+package com.github.mingchuno.aoc.y2023
+
+import com.github.mingchuno.aoc.interfaceing.Problem
+import com.github.mingchuno.aoc.utils.readFileFromResource
+
+object Day10 : Problem<Int> {
+    override fun computePart1(inputFile: String): Int {
+        val inputs = inputFile.readFileFromResource()
+        return DFS(inputs).run()
+    }
+
+    override fun computePart2(inputFile: String): Int {
+        TODO("Not yet implemented")
+    }
+
+    private fun Char.`in`(vararg chars: Char): Boolean = chars.contains(this)
+
+    private fun Char.inTop(): Boolean = `in`(VERTICAL, F, `7`)
+
+    private fun Char.inBottom(): Boolean = `in`(VERTICAL, J, L)
+
+    private fun Char.inLeft(): Boolean = `in`(HORIZONTAL, L, F)
+
+    private fun Char.inRight(): Boolean = `in`(HORIZONTAL, J, `7`)
+
+    private const val START = 'S'
+    private const val VERTICAL = '|'
+    private const val HORIZONTAL = '-'
+    private const val L = 'L'
+    private const val NE = L
+    private const val J = 'J'
+    private const val NW = J
+    private const val `7` = '7'
+    private const val SW = `7`
+    private const val F = 'F'
+    private const val SE = F
+    private const val GROUND = '.'
+
+    private class DFS(inputs: List<String>) {
+        private val X = inputs.first().length
+        private val Y = inputs.size
+        private val startingPos = findStartingPos(inputs)
+        private val startingChar = decideStartingChar(inputs, startingPos)
+        private val realInput = inputs.assumePipe(startingPos, startingChar)
+
+        fun run(): Int {
+            val nextDirection = startingChar.nextDirection().first()
+            return dfs(nextDirection.toPos(startingPos), steps = 1, nextDirection) / 2
+        }
+
+        private fun validXY(it: Pair<Int, Int>): Boolean {
+            val (x, y) = it
+            return (x in 0 ..< X) && (y in 0 ..< Y)
+        }
+
+        private fun findStartingPos(inputs: List<String>): Pair<Int, Int> {
+            inputs.forEachIndexed { y, input ->
+                input.forEachIndexed { x, c ->
+                    if (c == START) {
+                        return@findStartingPos x to y
+                    }
+                }
+            }
+            throw Exception("Starting pos not found!")
+        }
+
+        private fun decideStartingChar(inputs: List<String>, startingPos: Pair<Int, Int>): Char {
+            val (x, y) = startingPos
+            return decideStartingChar(
+                top = if (validXY(x to y - 1)) inputs[y - 1][x] else null,
+                right = if (validXY(x + 1 to y)) inputs[y][x + 1] else null,
+                bottom = if (validXY(x to y + 1)) inputs[y + 1][x] else null,
+                left = if (validXY(x - 1 to y)) inputs[y][x - 1] else null
+            )
+        }
+
+        private fun decideStartingChar(top: Char?, right: Char?, bottom: Char?, left: Char?): Char {
+            return if (top != null && bottom != null && top.inTop() && bottom.inBottom()) {
+                VERTICAL
+            } else if (left != null && right != null && left.inLeft() && right.inRight()) {
+                HORIZONTAL
+            } else if (left != null && top != null && left.inLeft() && top.inTop()) {
+                J
+            } else if (left != null && bottom != null && left.inLeft() && bottom.inBottom()) {
+                `7`
+            } else if (right != null && top != null && right.inRight() && top.inTop()) {
+                L
+            } else if (right != null && bottom != null && right.inRight() && bottom.inBottom()) {
+                F
+            } else {
+                throw Exception("Cannot decide starting pipe")
+            }
+        }
+
+        // init with step = 1, pos = first pipe next to S, previousDirection => S
+        private tailrec fun dfs(
+            pos: Pair<Int, Int>,
+            steps: Int,
+            previousDirection: Direction
+        ): Int {
+            val (x, y) = pos
+            if (pos == startingPos) {
+                println("arrive starting pos again:$pos with steps=$steps")
+                return steps // back to starting pos again
+            }
+            val currentNode = realInput[y][x]
+            val possibleDirections = currentNode.nextDirection()
+            val nextDirection = possibleDirections.first { it != previousDirection.oppsite() }
+            val nextPos = nextDirection.toPos(pos)
+            return dfs(nextPos, steps + 1, nextDirection)
+        }
+    }
+
+    private fun Char.nextDirection(): List<Direction> {
+        return when (this) {
+            VERTICAL -> listOf(Direction.T, Direction.B)
+            HORIZONTAL -> listOf(Direction.L, Direction.R)
+            NE -> listOf(Direction.T, Direction.R)
+            NW -> listOf(Direction.T, Direction.L)
+            SW -> listOf(Direction.B, Direction.L)
+            SE -> listOf(Direction.B, Direction.R)
+            GROUND -> throw Exception("Should not arrive here!")
+            else -> throw Exception("current node is unknown:${this}")
+        }
+    }
+
+    private fun Direction.toPos(start: Pair<Int, Int>): Pair<Int, Int> {
+        val (x, y) = start
+        return when (this) {
+            Direction.T -> x to y - 1
+            Direction.R -> x + 1 to y
+            Direction.L -> x - 1 to y
+            Direction.B -> x to y + 1
+        }
+    }
+
+    private fun List<String>.assumePipe(pos: Pair<Int, Int>, pipe: Char): List<String> {
+        val (x, y) = pos
+        return mapIndexed { yIdx, s ->
+            if (yIdx != y) s else StringBuilder(s).apply { setCharAt(x, pipe) }.toString()
+        }
+    }
+}
+
+enum class Direction {
+    T,
+    R,
+    B,
+    L
+}
+
+fun Direction.oppsite(): Direction {
+    return when (this) {
+        Direction.T -> Direction.B
+        Direction.B -> Direction.T
+        Direction.L -> Direction.R
+        Direction.R -> Direction.L
+    }
+}
