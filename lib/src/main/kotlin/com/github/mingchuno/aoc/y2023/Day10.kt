@@ -43,6 +43,7 @@ object Day10 : Problem<Int> {
         private val startingPos = findStartingPos(inputs)
         private val startingChar = decideStartingChar(inputs, startingPos)
         private val realInput = inputs.assumePipe(startingPos, startingChar)
+        // state
         private val visited = initVisited(inputs)
 
         private fun initVisited(inputs: List<String>): MutableList<MutableList<Boolean>> =
@@ -55,6 +56,7 @@ object Day10 : Problem<Int> {
 
         fun runPart2(): Int {
             run()
+            // state
             val areaMap = cleanInputs(realInput)
             for (x in 0 ..< X) {
                 for (y in 0 ..< Y) {
@@ -71,8 +73,8 @@ object Day10 : Problem<Int> {
 
         private fun isInside(x: Int, y: Int, areaMap: List<List<Char>>): Boolean {
             var count = 0
-            for (smallX in 0 ..< x) {
-                if (areaMap[y][smallX].`in`(VERTICAL, F, `7`)) {
+            for (i in 0 ..< x) {
+                if (areaMap[y][i].inTop()) {
                     count++
                 }
             }
@@ -87,12 +89,13 @@ object Day10 : Problem<Int> {
         ) {
             if (areaMap[y][x] == GROUND) {
                 areaMap[y][x] = fill
-                listOf(x to y - 1, x + 1 to y, x - 1 to y, x to y + 1)
-                    .filter { validXY(it) }
+                listOf(x to y - 1, x + 1 to y, x - 1 to y, x to y + 1) // Scan T,B,L,R
+                    .filter { validXY(it) } // Boundary check
                     .forEach { fillAreaWith(it.first, it.second, fill, areaMap) }
             }
         }
 
+        /** map all non-path tile into '.' */
         private fun cleanInputs(inputs: List<String>): MutableList<MutableList<Char>> {
             return inputs
                 .mapIndexed { y, input ->
