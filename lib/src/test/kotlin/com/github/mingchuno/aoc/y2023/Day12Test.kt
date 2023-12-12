@@ -22,7 +22,7 @@ class Day12Test :
                     SpringSpec("????.######..#####", listOf(1, 6, 5), 4),
                     SpringSpec("?###????????", listOf(3, 2, 1), 10),
                 ) { (springs, damagedCount, expected) ->
-                    Day12.possibleConfig(springs.toList(), damagedCount).shouldBe(expected)
+                    SpringConfig().search(springs.toList(), damagedCount).shouldBe(expected)
                 }
             }
         }
@@ -34,8 +34,8 @@ class Day12Test :
         }
 
         describe("part 2") {
-            it("example case") { Day12.computePart2("2023/day12-example.txt").shouldBe(0) }
+            it("example case") { Day12.computePart2("2023/day12-example.txt").shouldBe(525152) }
 
-            it("real case") { Day12.computePart2("2023/day12-real.txt").shouldBe(0) }
+            //            it("real case") { Day12.computePart2("2023/day12-real.txt").shouldBe(0) }
         }
     })

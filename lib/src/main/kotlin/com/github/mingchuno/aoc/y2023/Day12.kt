@@ -1,26 +1,16 @@
 package com.github.mingchuno.aoc.y2023
 
 import com.github.mingchuno.aoc.interfaceing.Problem
+import com.github.mingchuno.aoc.utils.pmap
 import com.github.mingchuno.aoc.utils.readFileFromResource
+import kotlinx.coroutines.runBlocking
 
-object Day12 : Problem<Int> {
-    override fun computePart1(inputFile: String): Int {
-        val inputs = inputFile.readFileFromResource()
-        return inputs
-            .map { line ->
-                val (springs, damaged) = line.split(" ")
-                possibleConfig(springs.toList(), damaged.split(",").map { it.toInt() })
-            }
-            .sum()
+class SpringConfig {
+    fun search(springs: List<Char>, damagedCount: List<Int>): Int {
+        return possibleConfig(springs, damagedCount)
     }
 
-    override fun computePart2(inputFile: String): Int {
-        val inputs = inputFile.readFileFromResource()
-        TODO("Not yet implemented")
-    }
-
-    fun possibleConfig(springs: List<Char>, damagedCount: List<Int>): Int {
-        println("processing springs=${springs.joinToString("")};damaged=$damagedCount")
+    private fun possibleConfig(springs: List<Char>, damagedCount: List<Int>): Int {
         if (springs.isEmpty() && damagedCount.isEmpty()) {
             return 1
         }
@@ -42,8 +32,7 @@ object Day12 : Problem<Int> {
                         if (springs.size == firstDamage) {
                             possibleConfig(listOf(), damagedCount.drop(1))
                         } else {
-                            val nextSpring = springs[firstDamage]
-                            when (nextSpring) {
+                            when (springs[firstDamage]) {
                                 '#' -> 0
                                 else ->
                                     possibleConfig(
@@ -66,4 +55,30 @@ object Day12 : Problem<Int> {
     }
 
     private fun <T> List<T>.replaceFirst(value: T): List<T> = toMutableList().also { it[0] = value }
+}
+
+object Day12 : Problem<Int> {
+    override fun computePart1(inputFile: String): Int {
+        val inputs = inputFile.readFileFromResource()
+        return inputs
+            .map { line ->
+                val (springs, damaged) = line.split(" ")
+                SpringConfig().search(springs.toList(), damaged.split(",").map { it.toInt() })
+            }
+            .sum()
+    }
+
+    override fun computePart2(inputFile: String): Int {
+        val inputs = inputFile.readFileFromResource()
+        return runBlocking {
+            inputs
+                .pmap { line ->
+                    val (springs, damaged) = line.split(" ")
+                    val fullSprings = List(5) { springs }.joinToString("?")
+                    val fullDamaged = List(5) { damaged.split(",").map { it.toInt() } }.flatten()
+                    SpringConfig().search(fullSprings.toList(), fullDamaged)
+                }
+                .sum()
+        }
+    }
 }
