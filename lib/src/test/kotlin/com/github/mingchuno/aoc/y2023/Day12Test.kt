@@ -27,6 +27,39 @@ class Day12Test :
             }
         }
 
+        describe("possible config part 2") {
+            context("possibleConfig") {
+                withData(
+                    nameFn = {
+                        "${it.springs} ${it.damagedCount} should have ${it.expected} possible config"
+                    },
+                    SpringSpec("???.###", listOf(1, 1, 3), 1),
+                    SpringSpec(".??..??...?##.", listOf(1, 1, 3), 16384),
+                    SpringSpec("?#?#?#?#?#?#?#?", listOf(1, 3, 1, 6), 1),
+                    SpringSpec("????.#...#...", listOf(4, 1, 1), 16),
+                    SpringSpec("????.######..#####.", listOf(1, 6, 5), 2500),
+                    SpringSpec("?###????????", listOf(3, 2, 1), 506250),
+                ) { (springs, damagedCount, expected) ->
+                    SpringConfig().part2(springs, damagedCount.joinToString(",")).shouldBe(expected)
+                }
+            }
+        }
+
+        describe("search2") {
+            it("atom case 1") { SpringConfig().search2(listOf("###"), listOf(3)).shouldBe(1) }
+            it("atom case 2") { SpringConfig().search2(listOf("???"), listOf(1, 1)).shouldBe(1) }
+            it("atom case 3") {
+                SpringConfig().search2(listOf("???", "###"), listOf(1, 1, 3)).shouldBe(1)
+            }
+            it("atom case 4") {
+                SpringConfig().search2(listOf("??", "??", "?##"), listOf(1, 1, 3)).shouldBe(4)
+            }
+            it("atom case 5") {
+                SpringConfig().search2(listOf("?###????????"), listOf(3, 2, 1)).shouldBe(10)
+            }
+            it("atom case 6") { SpringConfig().search2(listOf("?????"), listOf(4)).shouldBe(2) }
+        }
+
         describe("part 1") {
             it("example case") { Day12.computePart1("2023/day12-example.txt").shouldBe(21) }
 
@@ -36,6 +69,6 @@ class Day12Test :
         describe("part 2") {
             it("example case") { Day12.computePart2("2023/day12-example.txt").shouldBe(525152) }
 
-            //            it("real case") { Day12.computePart2("2023/day12-real.txt").shouldBe(0) }
+            it("real case") { Day12.computePart2("2023/day12-real.txt").shouldBe(0) }
         }
     })
