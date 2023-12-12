@@ -69,6 +69,32 @@ class Day12Test :
         describe("part 2") {
             it("example case") { Day12.computePart2("2023/day12-example.txt").shouldBe(525152) }
 
-            it("real case") { Day12.computePart2("2023/day12-real.txt").shouldBe(0) }
+            it("real case") { Day12.computePart2("2023/day12-real.txt").shouldBe(6720660274964) }
+        }
+
+        describe("part 2 test") {
+            context("part2") {
+                withData(
+                    nameFn = {
+                        "${it.springs} ${it.damagedCount} should have ${it.expected} possible config"
+                    },
+                    SpringSpec("??#??????#..?????", listOf(9, 2, 1), 3888),
+                    SpringSpec("????.????.", listOf(1, 1), 345615702),
+                ) { (springs, damagedCount, expected) ->
+                    SpringConfig().part2(springs, damagedCount.joinToString(",")).shouldBe(expected)
+                }
+            }
+
+            context("possibleConfig") {
+                withData(
+                    nameFn = {
+                        "${it.springs} ${it.damagedCount} should have ${it.expected} possible config"
+                    },
+                    SpringSpec("??#??????#..?????", listOf(9, 2, 1), 3),
+                    SpringSpec("????.????.", listOf(1, 1), 22),
+                ) { (springs, damagedCount, expected) ->
+                    SpringConfig().search(springs.toList(), damagedCount).shouldBe(expected)
+                }
+            }
         }
     })
