@@ -12,8 +12,8 @@ class Day13Test :
         }
 
         describe("part 2") {
-            it("example case") { Day13.computePart2("2023/day13-example.txt").shouldBe(0) }
+            it("example case") { Day13.computePart2("2023/day13-example.txt").shouldBe(400) }
 
-            it("real case") { Day13.computePart2("2023/day13-real.txt").shouldBe(0) }
+            it("real case") { Day13.computePart2("2023/day13-real.txt").shouldBe(40995) }
         }
     })
