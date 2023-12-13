@@ -1,24 +1,13 @@
 package com.github.mingchuno.aoc.y2023
 
 import com.github.mingchuno.aoc.utils.readFileFromResource
+import com.github.mingchuno.aoc.utils.transpose
 import kotlin.math.abs
 
 object Day11 {
     /** Part 1 is just special case of Part 2 */
     fun computePart1(inputFile: String): Long {
         return computePart2(inputFile)
-    }
-
-    private fun <T> List<List<T>>.transpose(): List<List<T>> {
-        val y = this.size
-        val x = this.first().size
-        val result = MutableList(x) { MutableList(y) { this.first().first() } }
-        for (i in 0 ..< y) {
-            for (j in 0 ..< x) {
-                result[j][i] = this[i][j]
-            }
-        }
-        return result
     }
 
     private fun List<List<Char>>.findGalaxies(): List<Pair<Int, Int>> {
