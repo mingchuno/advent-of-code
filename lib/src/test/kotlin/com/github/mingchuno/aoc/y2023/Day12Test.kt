@@ -26,6 +26,9 @@ class Day12Test :
                 SpringSpec("?????", listOf(4), 2),
             ) { (springs, damagedCount, expected) ->
                 SpringConfig(1).search(springs, damagedCount.joinToString(",")).shouldBe(expected)
+                SpringConfigV2(springs, damagedCount.joinToString(","), 1)
+                    .search()
+                    .shouldBe(expected)
             }
         }
 
@@ -47,6 +50,9 @@ class Day12Test :
                 SpringSpec("????.????.", listOf(1, 1), 345615702),
             ) { (springs, damagedCount, expected) ->
                 SpringConfig(5).search(springs, damagedCount.joinToString(",")).shouldBe(expected)
+                SpringConfigV2(springs, damagedCount.joinToString(","), 5)
+                    .search()
+                    .shouldBe(expected)
             }
         }
 
