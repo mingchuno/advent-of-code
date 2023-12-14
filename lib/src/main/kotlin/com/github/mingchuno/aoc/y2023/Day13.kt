@@ -12,7 +12,7 @@ object Day13 : Problem<Int> {
         return patterns
             .mapNotNull { pattern ->
                 pattern.findReflectionOnRow()?.let { it * 100 }
-                    ?: pattern.map { it.toList() }.transpose().findReflectionOnRow()
+                    ?: pattern.transpose().findReflectionOnRow()
             }
             .sum()
     }
@@ -23,10 +23,12 @@ object Day13 : Problem<Int> {
         return patterns
             .mapNotNull { pattern ->
                 pattern.findReflectionOnRowWithSmudge()?.let { it * 100 }
-                    ?: pattern.map { it.toList() }.transpose().findReflectionOnRowWithSmudge()
+                    ?: pattern.transpose().findReflectionOnRowWithSmudge()
             }
             .sum()
     }
+
+    private fun List<String>.transpose(): List<List<Char>> = map { it.toList() }.transpose()
 
     private fun parsePattern(inputs: List<String>): List<List<String>> {
         val results = mutableListOf<List<String>>()
