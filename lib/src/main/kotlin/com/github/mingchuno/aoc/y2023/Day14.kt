@@ -39,6 +39,12 @@ class PlatformV2(platform: List<String>) {
         xs.mapIndexedNotNull { x, c -> if (c == char) x else null }
     }
 
+    init {
+        val cubeCount = cubesInX.sumOf { it.size }
+        val rockCount = initialRocks.sumOf { it.size }
+        println("rockCount=$rockCount;cubeCount=$cubeCount;SIZE=${SIZE}x${SIZE}")
+    }
+
     /** Run enough cycles to deduce the pattern and compute ans */
     fun run(): Int {
         var res = initialRocks
