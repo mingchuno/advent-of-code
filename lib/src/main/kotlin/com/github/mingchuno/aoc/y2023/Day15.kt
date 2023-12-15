@@ -9,13 +9,20 @@ object Day15 : Problem<Int> {
         return inputs.sumOf { it.hash() }
     }
 
-    private fun String.hash(): Int {
-        return fold(0) { acc, c -> ((acc + c.code) * 17).mod(256) }
-    }
-
     override fun computePart2(inputFile: String): Int {
         val instructions = inputFile.readFileFromResource().first().split(",")
-        val facility = List(256) { Box(it) }
+        return Facility().passInstructionsAndComputePower(instructions)
+    }
+}
+
+private fun String.hash(): Int {
+    return fold(0) { acc, c -> ((acc + c.code) * 17).mod(256) }
+}
+
+private class Facility {
+    private val facility = List(256) { Box(it) }
+
+    fun passInstructionsAndComputePower(instructions: List<String>): Int {
         for (instruction in instructions) {
             if (instruction.contains("-")) {
                 val (label) = instruction.split("-")
