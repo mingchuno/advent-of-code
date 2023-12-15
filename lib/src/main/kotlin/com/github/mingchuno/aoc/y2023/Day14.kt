@@ -69,7 +69,7 @@ class PlatformV2(platform: List<String>) {
         val cycle = possibleCycleCount.values.first().first()
         val startOffset = cycles.values.flatten().min()
         val answerCycle = startOffset + (iterTarget - startOffset).mod(cycle)
-        println("startOffset=$startOffset;cycle=$cycle;repeatingCycle=$answerCycle")
+        println("startOffset=$startOffset;cycle=$cycle;answerCycle=$answerCycle")
         return this.firstNotNullOf { (score, vs) -> if (vs.contains(answerCycle)) score else null }
     }
 
