@@ -1,6 +1,8 @@
 package com.github.mingchuno.aoc.y2023
 
 import com.github.mingchuno.aoc.interfaceing.Problem
+import com.github.mingchuno.aoc.utils.Direction
+import com.github.mingchuno.aoc.utils.opposite
 import com.github.mingchuno.aoc.utils.readFileFromResource
 
 object Day10 : Problem<Int> {
@@ -161,7 +163,7 @@ object Day10 : Problem<Int> {
             }
             val currentNode = realInput[y][x]
             val possibleDirections = currentNode.nextDirection()
-            val nextDirection = possibleDirections.first { it != previousDirection.oppsite() }
+            val nextDirection = possibleDirections.first { it != previousDirection.opposite() }
             val nextPos = nextDirection.toPos(pos)
             return dfs(nextPos, steps + 1, nextDirection)
         }
@@ -169,12 +171,12 @@ object Day10 : Problem<Int> {
 
     private fun Char.nextDirection(): List<Direction> {
         return when (this) {
-            VERTICAL -> listOf(Direction.T, Direction.B)
-            HORIZONTAL -> listOf(Direction.L, Direction.R)
-            NE -> listOf(Direction.T, Direction.R)
-            NW -> listOf(Direction.T, Direction.L)
-            SW -> listOf(Direction.B, Direction.L)
-            SE -> listOf(Direction.B, Direction.R)
+            VERTICAL -> listOf(Direction.UP, Direction.DOWN)
+            HORIZONTAL -> listOf(Direction.LEFT, Direction.RIGHT)
+            NE -> listOf(Direction.UP, Direction.RIGHT)
+            NW -> listOf(Direction.UP, Direction.LEFT)
+            SW -> listOf(Direction.DOWN, Direction.LEFT)
+            SE -> listOf(Direction.DOWN, Direction.RIGHT)
             GROUND -> throw Exception("Should not arrive here!")
             else -> throw Exception("current node is unknown:${this}")
         }
@@ -183,10 +185,10 @@ object Day10 : Problem<Int> {
     private fun Direction.toPos(start: Pair<Int, Int>): Pair<Int, Int> {
         val (x, y) = start
         return when (this) {
-            Direction.T -> x to y - 1
-            Direction.R -> x + 1 to y
-            Direction.L -> x - 1 to y
-            Direction.B -> x to y + 1
+            Direction.UP -> x to y - 1
+            Direction.RIGHT -> x + 1 to y
+            Direction.LEFT -> x - 1 to y
+            Direction.DOWN -> x to y + 1
         }
     }
 
@@ -195,21 +197,5 @@ object Day10 : Problem<Int> {
         return mapIndexed { yIdx, s ->
             if (yIdx != y) s else StringBuilder(s).apply { setCharAt(x, pipe) }.toString()
         }
-    }
-}
-
-enum class Direction {
-    T,
-    R,
-    B,
-    L
-}
-
-fun Direction.oppsite(): Direction {
-    return when (this) {
-        Direction.T -> Direction.B
-        Direction.B -> Direction.T
-        Direction.L -> Direction.R
-        Direction.R -> Direction.L
     }
 }

@@ -1,11 +1,11 @@
 package com.github.mingchuno.aoc
 
-import com.github.mingchuno.aoc.y2023.Day8
+import com.github.mingchuno.aoc.y2023.Day17
 import kotlinx.coroutines.runBlocking
 
 fun main() {
     runBlocking {
-        val ans = Day8.computePart2Method2("2023/day8-real.txt")
+        val ans = Day17.computePart1("2023/day17-example.txt")
         println("Ans=$ans")
     }
 }

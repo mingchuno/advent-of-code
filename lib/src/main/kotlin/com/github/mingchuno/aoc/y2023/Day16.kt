@@ -1,6 +1,7 @@
 package com.github.mingchuno.aoc.y2023
 
 import com.github.mingchuno.aoc.interfaceing.Problem
+import com.github.mingchuno.aoc.utils.Direction
 import com.github.mingchuno.aoc.utils.readFileFromResource
 
 object Day16 : Problem<Int> {
@@ -15,14 +16,7 @@ object Day16 : Problem<Int> {
     }
 }
 
-enum class BeamDirection {
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT
-}
-
-private data class Beam(val x: Int, val y: Int, val direction: BeamDirection)
+private data class Beam(val x: Int, val y: Int, val direction: Direction)
 
 /** Not thread safe! */
 class Contraption(private val input: List<List<Char>>) {
@@ -36,11 +30,7 @@ class Contraption(private val input: List<List<Char>>) {
     }
 
     /** Part 1 */
-    fun computeEnergized(
-        x: Int = 0,
-        y: Int = 0,
-        direction: BeamDirection = BeamDirection.RIGHT
-    ): Int {
+    fun computeEnergized(x: Int = 0, y: Int = 0, direction: Direction = Direction.RIGHT): Int {
         move(x, y, direction)
         return uniqueCoord().also { reset() }
     }
@@ -49,12 +39,12 @@ class Contraption(private val input: List<List<Char>>) {
     fun findMaxEnergyConfigScore(): Int {
         val score = mutableListOf<Int>()
         for (x in 0 ..< X) {
-            score.add(computeEnergized(x, 0, BeamDirection.DOWN)) // Top edge
-            score.add(computeEnergized(x, Y - 1, BeamDirection.UP)) // Bottom edge
+            score.add(computeEnergized(x, 0, Direction.DOWN)) // Top edge
+            score.add(computeEnergized(x, Y - 1, Direction.UP)) // Bottom edge
         }
         for (y in 0 ..< Y) {
-            score.add(computeEnergized(0, y, BeamDirection.RIGHT)) // Left edge
-            score.add(computeEnergized(X - 1, y, BeamDirection.LEFT)) // Right edge
+            score.add(computeEnergized(0, y, Direction.RIGHT)) // Left edge
+            score.add(computeEnergized(X - 1, y, Direction.LEFT)) // Right edge
         }
         return score.max()
     }
@@ -64,22 +54,22 @@ class Contraption(private val input: List<List<Char>>) {
     }
 
     private fun moveRight(x: Int, y: Int) {
-        if (x + 1 < X) move(x + 1, y, BeamDirection.RIGHT)
+        if (x + 1 < X) move(x + 1, y, Direction.RIGHT)
     }
 
     private fun moveLeft(x: Int, y: Int) {
-        if (x - 1 >= 0) move(x - 1, y, BeamDirection.LEFT)
+        if (x - 1 >= 0) move(x - 1, y, Direction.LEFT)
     }
 
     private fun moveUp(x: Int, y: Int) {
-        if (y - 1 >= 0) move(x, y - 1, BeamDirection.UP)
+        if (y - 1 >= 0) move(x, y - 1, Direction.UP)
     }
 
     private fun moveDown(x: Int, y: Int) {
-        if (y + 1 < Y) move(x, y + 1, BeamDirection.DOWN)
+        if (y + 1 < Y) move(x, y + 1, Direction.DOWN)
     }
 
-    private fun move(x: Int, y: Int, direction: BeamDirection) {
+    private fun move(x: Int, y: Int, direction: Direction) {
         val tile = input[y][x]
         val beam = Beam(x, y, direction)
         if (visited.contains(beam)) {
@@ -87,7 +77,7 @@ class Contraption(private val input: List<List<Char>>) {
         }
         visited.add(beam)
         when (direction) {
-            BeamDirection.UP -> {
+            Direction.UP -> {
                 when (tile) {
                     '/' -> moveRight(x, y)
                     '\\' -> moveLeft(x, y)
@@ -98,7 +88,7 @@ class Contraption(private val input: List<List<Char>>) {
                     else -> moveUp(x, y)
                 }
             }
-            BeamDirection.DOWN -> {
+            Direction.DOWN -> {
                 when (tile) {
                     '/' -> moveLeft(x, y)
                     '\\' -> moveRight(x, y)
@@ -109,7 +99,7 @@ class Contraption(private val input: List<List<Char>>) {
                     else -> moveDown(x, y)
                 }
             }
-            BeamDirection.LEFT -> {
+            Direction.LEFT -> {
                 when (tile) {
                     '/' -> moveDown(x, y)
                     '\\' -> moveUp(x, y)
@@ -120,7 +110,7 @@ class Contraption(private val input: List<List<Char>>) {
                     else -> moveLeft(x, y)
                 }
             }
-            BeamDirection.RIGHT -> {
+            Direction.RIGHT -> {
                 when (tile) {
                     '/' -> moveUp(x, y)
                     '\\' -> moveDown(x, y)
