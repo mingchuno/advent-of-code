@@ -10,48 +10,40 @@ object Day18 : Problem<Long> {
     override fun computePart1(inputFile: String): Long {
         val inputs = inputFile.readFileFromResource()
         val instructions = inputs.map { parseLine(it) }
-        return MassivePlan(instructions).answer()
+        return findArea(instructions)
     }
 
     override fun computePart2(inputFile: String): Long {
         val inputs = inputFile.readFileFromResource()
         val instructions = inputs.map { parseLine(it).parsePart2() }
-        return MassivePlan(instructions).answer()
-    }
-}
-
-private class MassivePlan(private val instructions: List<Instruction>) {
-    private val vertices: List<LongCoord> by lazy {
-        instructions.scan(0L to 0L) { acc, instruction ->
-            val (x, y) = acc
-            when (instruction.direction) {
-                Direction.RIGHT -> x + instruction.steps to y
-                Direction.LEFT -> x - instruction.steps to y
-                Direction.UP -> x to y - instruction.steps
-                Direction.DOWN -> x to y + instruction.steps
-            }
-        }
+        return findArea(instructions)
     }
 
-    // https://brilliant.org/wiki/area-of-a-polygon/
-    private val area: Long by lazy {
-        abs(
-            (vertices + vertices[0])
-                .zipWithNext { prev, next ->
-                    val (x1, y1) = prev
-                    val (x2, y2) = next
-                    x1 * y2 - y1 * x2
+    private fun findArea(instructions: List<Instruction>): Long {
+        val vertices: List<LongCoord> =
+            instructions.scan(0L to 0L) { acc, instruction ->
+                val (x, y) = acc
+                when (instruction.direction) {
+                    Direction.RIGHT -> x + instruction.steps to y
+                    Direction.LEFT -> x - instruction.steps to y
+                    Direction.UP -> x to y - instruction.steps
+                    Direction.DOWN -> x to y + instruction.steps
                 }
-                .sum() / 2
-        )
-    }
-
-    private val boundary: Long by lazy { instructions.sumOf { it.steps.toLong() } }
-
-    // https://en.wikipedia.org/wiki/Pick%27s_theorem
-    private val interior: Long by lazy { area + 1 - boundary / 2 }
-
-    fun answer(): Long {
+            }
+        // https://brilliant.org/wiki/area-of-a-polygon/
+        val area: Long =
+            abs(
+                (vertices + vertices[0])
+                    .zipWithNext { prev, next ->
+                        val (x1, y1) = prev
+                        val (x2, y2) = next
+                        x1 * y2 - y1 * x2
+                    }
+                    .sum() / 2
+            )
+        val boundary: Long = instructions.sumOf { it.steps.toLong() }
+        // https://en.wikipedia.org/wiki/Pick%27s_theorem
+        val interior: Long = area + 1 - boundary / 2
         println("interior=$interior;boundary=$boundary;area=$area")
         return interior + boundary
     }
