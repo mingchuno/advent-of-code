@@ -2,6 +2,8 @@ package com.github.mingchuno.aoc.utils
 
 typealias Coord = Pair<Int, Int>
 
+typealias LongCoord = Pair<Long, Long>
+
 enum class Direction {
     UP,
     DOWN,

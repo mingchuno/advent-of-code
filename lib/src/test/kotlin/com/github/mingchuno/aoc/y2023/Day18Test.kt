@@ -12,8 +12,10 @@ class Day18Test :
         }
 
         describe("part 2") {
-            it("example case") { Day18.computePart2("2023/day18-example.txt").shouldBe(0) }
+            it("example case") {
+                Day18.computePart2("2023/day18-example.txt").shouldBe(952408144115L)
+            }
 
-            it("real case") { Day18.computePart2("2023/day18-real.txt").shouldBe(0) }
+            it("real case") { Day18.computePart2("2023/day18-real.txt").shouldBe(159485361249806L) }
         }
     })
