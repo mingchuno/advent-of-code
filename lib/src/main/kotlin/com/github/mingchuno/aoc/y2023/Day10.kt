@@ -39,7 +39,7 @@ object Day10 : Problem<Int> {
     private const val SE = F
     private const val GROUND = '.'
 
-    private class DFS(inputs: List<String>) {
+    class DFS(inputs: List<String>) {
         private val X = inputs.first().length
         private val Y = inputs.size
         private val startingPos = findStartingPos(inputs)
@@ -71,6 +71,23 @@ object Day10 : Problem<Int> {
                 }
             }
             return areaMap.sumOf { it.count { char -> char == 'I' } }
+        }
+
+        fun totalArea(): Int {
+            val nextDirection = startingChar.nextDirection().first()
+            val walls = dfs(nextDirection.toPos(startingPos), steps = 1, nextDirection)
+            val areaMap = cleanInputs(realInput)
+            for (x in 0 ..< X) {
+                for (y in 0 ..< Y) {
+                    if (areaMap[y][x] == GROUND) {
+                        // decide if it is `I` or `O` by odd/even
+                        val isPosInside = isInside(x, y, areaMap)
+                        areaMap[y][x] = if (isPosInside) 'I' else 'O'
+                    }
+                }
+            }
+            val internal = areaMap.sumOf { it.count { char -> char == 'I' } }
+            return walls + internal
         }
 
         private fun isInside(x: Int, y: Int, areaMap: List<List<Char>>): Boolean {
@@ -158,7 +175,6 @@ object Day10 : Problem<Int> {
             val (x, y) = pos
             visited[y][x] = true
             if (pos == startingPos) {
-                println("arrive starting pos again:$pos with steps=$steps")
                 return steps // back to starting pos again
             }
             val currentNode = realInput[y][x]
