@@ -2,98 +2,122 @@ package com.github.mingchuno.aoc.y2023
 
 import com.github.mingchuno.aoc.interfaceing.Problem
 import com.github.mingchuno.aoc.utils.Coord
+import com.github.mingchuno.aoc.utils.Direction
+import com.github.mingchuno.aoc.utils.opposite
 import com.github.mingchuno.aoc.utils.readFileFromResource
-import kotlin.math.abs
 
 object Day17 : Problem<Int> {
     override fun computePart1(inputFile: String): Int {
-        val inputs = inputFile.readFileFromResource().map { str -> str.map { it.digitToInt() } }
-        return Dijkstra(inputs).findShortestPath()
+        val inputs = inputFile.readFileFromResource().parseInput()
+        return DijkstraV2(inputs).shortestPath()
     }
 
     override fun computePart2(inputFile: String): Int {
-        val inputs = inputFile.readFileFromResource()
+        val inputs = inputFile.readFileFromResource().parseInput()
         TODO("Not yet implemented")
     }
 }
 
-private class Dijkstra(private val graph: List<List<Int>>) {
-    private val SIZE = graph.size
+private data class GraphNode(
+    val coord: Coord,
+    val travelDir: Direction,
+    val stepsBeforeLastTurn: Int
+)
 
-    private val debug = true
+private val ALL_DIRECTION = listOf(Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT)
 
-    private val visited: List<MutableList<Boolean>> = List(SIZE) { MutableList(SIZE) { false } }
-    private val prevNode: MutableMap<Coord, Coord> = mutableMapOf()
-    private val costs: MutableMap<Coord, Int> by lazy {
-        val map = mutableMapOf<Coord, Int>()
-        for (x in 0 ..< SIZE) {
-            for (y in 0 ..< SIZE) {
-                map[x to y] = if (x == 0 && y == 0) 0 else Int.MAX_VALUE
+private class DijkstraV2(private val graph: List<List<Int>>) {
+    private val X = graph.first().size
+    private val Y = graph.size
+    private val costs: MutableMap<GraphNode, Int> = mutableMapOf()
+    private val prevNode: MutableMap<GraphNode, GraphNode> = mutableMapOf()
+    private val visited: MutableMap<GraphNode, Boolean> = mutableMapOf()
+
+    init {
+        for (x in 0 ..< X) {
+            for (y in 0 ..< Y) {
+                val cost = if (x == 0 && y == 0) 0 else Int.MAX_VALUE
+                val nodes =
+                    if (x == 0 && y == 0) {
+                        listOf(Direction.RIGHT, Direction.DOWN /* doesn't matter */).map { d ->
+                            GraphNode(0 to 0, d, 0)
+                        }
+                    } else {
+                        ALL_DIRECTION.flatMap { d -> (1..3).map { s -> GraphNode(x to y, d, s) } }
+                    }
+                nodes.forEach {
+                    costs[it] = cost
+                    visited[it] = false
+                }
             }
         }
-        map
     }
 
-    private fun printPath(x: Int = SIZE - 1, y: Int = SIZE - 1) {
+    private fun printPath(start: GraphNode) {
+        val (x, y) = start.coord
+        println(start)
         if (x == 0 && y == 0) {
             return
         }
-        val prev = prevNode[x to y]
+        val prev = prevNode[start]
         if (prev != null) {
-            val (px, py) = prev
-            println("x=$px;y=$py;cost=${graph[py][px]}")
-            printPath(px, py)
+            printPath(prev)
         }
     }
 
-    fun findShortestPath(): Int {
+    fun shortestPath(): Int {
         while (costs.isNotEmpty()) {
-            val (coord, cost) = costs.minBy { (_, cost) -> cost }
-            val (nX, nY) = coord
-            costs.remove(coord)
-            if (nX + 1 == SIZE && nY + 1 == SIZE) {
-                if (debug) printPath()
+            val (node, cost) = costs.minBy { (_, cost) -> cost }
+            val (nX, nY) = node.coord
+            costs.remove(node)
+            if (nX + 1 == X && nY + 1 == Y) { // FIXME: condition is correct?
                 return cost
             }
-            val neighbors = findNeighbor(nX, nY)
-            if (debug) println("nX=$nX;nY=$nY;neighbors=$neighbors")
-            neighbors.forEach { (x, y) ->
+            val neighbors = findNeighbors(node)
+            neighbors.forEach { neighbor ->
+                val (x, y) = neighbor.coord
                 val newCost = graph[y][x] + cost
-                val oldCost = costs[x to y]!!
+                val oldCost = costs[neighbor]!!
                 if (newCost < oldCost) {
-                    costs[x to y] = newCost
-                    prevNode[x to y] = nX to nY
+                    costs[neighbor] = newCost
+                    prevNode[neighbor] = node
                 }
             }
-            visited[nY][nX] = true
+            visited[node] = true
         }
-        throw Exception("Error!")
+        throw Exception("This should not happens")
     }
 
-    private fun findNeighbor(x: Int, y: Int): List<Coord> {
-        val maxSameSteps = 3
-        val neighbor = mutableListOf<Coord>()
-        val back3Steps = backtrack(x to y, maxSameSteps)
-        if (debug) println("x=$x;y=$y;back3Steps=$back3Steps")
-        val (invalidXDirection, invalidYDirection) =
-            if (back3Steps == null) {
-                false to false
-            } else {
-                val (px, py) = back3Steps
-                (abs(px - x) == maxSameSteps && py == y) to (abs(py - y) == maxSameSteps && px == x)
-            }
-        if (validCoord(x + 1, y) && !invalidXDirection) neighbor.add(x + 1 to y)
-        if (validCoord(x - 1, y) && !invalidXDirection) neighbor.add(x - 1 to y)
-        if (validCoord(x, y + 1) && !invalidYDirection) neighbor.add(x to y + 1)
-        if (validCoord(x, y - 1) && !invalidYDirection) neighbor.add(x to y - 1)
-        return neighbor
+    private fun findNeighbors(node: GraphNode): List<GraphNode> {
+        val (coord, travelDir, stepsBeforeLastTurn) = node
+        val (x, y) = coord
+        return listOfNotNull(
+            formValidNode(x, y - 1, Direction.UP, travelDir, stepsBeforeLastTurn),
+            formValidNode(x, y + 1, Direction.DOWN, travelDir, stepsBeforeLastTurn),
+            formValidNode(x - 1, y, Direction.LEFT, travelDir, stepsBeforeLastTurn),
+            formValidNode(x + 1, y, Direction.RIGHT, travelDir, stepsBeforeLastTurn)
+        )
     }
 
-    private fun backtrack(from: Coord, count: Int): Coord? {
-        if (count == 0) return from
-        return prevNode[from]?.let { backtrack(it, count - 1) }
+    private fun formValidNode(
+        x: Int,
+        y: Int,
+        travelDir: Direction,
+        fromDir: Direction,
+        stepsBeforeLastTurn: Int
+    ): GraphNode? {
+        val newSteps = if (travelDir == fromDir) stepsBeforeLastTurn + 1 else 1
+        val node = GraphNode(x to y, travelDir, newSteps)
+        return if (
+            x in 0 ..< X &&
+                y in 0 ..< Y &&
+                newSteps <= 3 &&
+                fromDir.opposite() != travelDir &&
+                (visited[node] == false)
+        ) {
+            node
+        } else null
     }
-
-    private fun validCoord(x: Int, y: Int): Boolean =
-        x in 0 ..< SIZE && y in 0 ..< SIZE && !visited[y][x]
 }
+
+private fun List<String>.parseInput(): List<List<Int>> = map { str -> str.map { it.digitToInt() } }
