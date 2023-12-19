@@ -20,7 +20,7 @@ class Day17Test :
             }
         }
 
-        // ~432ms runtime
+        // ~300ms runtime
         describe("part 1 real") {
             it("real case") { Day17.computePart1("2023/day17-real.txt").shouldBe(1138) }
         }
@@ -30,7 +30,7 @@ class Day17Test :
             it("example case part 2") { Day17.computePart2("2023/day17-example7.txt").shouldBe(71) }
         }
 
-        // ~2s runtime
+        // ~1.5s runtime
         describe("part 2 real") {
             it("real case") { Day17.computePart2("2023/day17-real.txt").shouldBe(1312) }
         }

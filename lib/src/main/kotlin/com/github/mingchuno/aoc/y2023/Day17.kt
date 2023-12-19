@@ -22,8 +22,6 @@ private data class GraphNode(
     val stepsBeforeLastTurn: Int
 )
 
-private val ALL_DIRECTION = listOf(Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT)
-
 private class PriorityMap<K, V>(comparator: Comparator<Pair<K, V>>) {
     private val map: MutableMap<K, V> = mutableMapOf()
     private val q: PriorityQueue<Pair<K, V>> = PriorityQueue(comparator)
@@ -56,28 +54,11 @@ class Dijkstra(
         a.second.compareTo(b.second)
     }
     private val prevNode: MutableMap<GraphNode, GraphNode> = mutableMapOf()
-    private val visited: MutableMap<GraphNode, Boolean> = mutableMapOf()
+    private val visited: MutableSet<GraphNode> = mutableSetOf()
 
     init {
         assert(minSteps < maxSteps)
         // Init graph state for Dijkstra
-        for (x in 0 ..< X) {
-            for (y in 0 ..< Y) {
-                val nodes =
-                    if (x == 0 && y == 0) { // top left
-                        listOf(Direction.RIGHT, Direction.DOWN).map { d -> GraphNode(0 to 0, d, 0) }
-                    } else if (x + 1 == X && y + 1 == Y) { // bottom right
-                        listOf(Direction.RIGHT, Direction.DOWN).flatMap { d ->
-                            (minSteps..maxSteps).map { s -> GraphNode(x to y, d, s) }
-                        }
-                    } else { // others
-                        ALL_DIRECTION.flatMap { d ->
-                            (1..maxSteps).map { s -> GraphNode(x to y, d, s) }
-                        }
-                    }
-                nodes.forEach { visited[it] = false }
-            }
-        }
         listOf(Direction.RIGHT, Direction.DOWN)
             .map { GraphNode(0 to 0, it, 0) }
             .forEach { costs.add(it, 0) }
@@ -98,7 +79,7 @@ class Dijkstra(
         while (costs.isNotEmpty()) {
             val (node, cost) = costs.poll()
             val (nX, nY) = node.coord
-            if (nX + 1 == X && nY + 1 == Y) {
+            if (nX + 1 == X && nY + 1 == Y && node.stepsBeforeLastTurn >= minSteps) {
                 return cost
             }
             val neighbors = findNeighbors(node)
@@ -111,7 +92,7 @@ class Dijkstra(
                     prevNode[neighbor] = node
                 }
             }
-            visited[node] = true
+            visited.add(node)
         }
         throw Exception("This should not happens")
     }
@@ -144,7 +125,7 @@ class Dijkstra(
                 y in 0 ..< Y &&
                 newSteps <= maxSteps &&
                 fromDir.opposite() != travelDir &&
-                (visited[node] == false)
+                !visited.contains(node)
         ) {
             node
         } else null
