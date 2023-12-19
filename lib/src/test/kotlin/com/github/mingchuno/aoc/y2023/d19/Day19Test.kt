@@ -1,4 +1,4 @@
-package com.github.mingchuno.aoc.y2023
+package com.github.mingchuno.aoc.y2023.d19
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.matchers.shouldBe
