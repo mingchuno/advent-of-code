@@ -23,28 +23,22 @@ object Day19 : Problem<Long> {
 
 private typealias Workflows = Map<String, Workflow>
 
-private data class BackTrackingRule(val rule: RuleBase, var truthful: Boolean)
+data class BackTrackingRule(val rule: RuleBase, var truthful: Boolean)
 
 private fun revereRulesTracking(workflows: Workflows): List<List<BackTrackingRule>> {
     val reversedWorkflows = workflows.mapValues { (k, v) -> v.copy(rules = v.rules.reversed()) }
     val backtrackingIndex = findKeyAndHitIndex(reversedWorkflows)
-
-    //    reversedWorkflows.onEach { println(it) }
-    //    backtrackingIndex.onEach { println(it) }
-
     val results = mutableListOf<List<BackTrackingRule>>()
     reversedWorkflows.forEach { (key, workflow) ->
         workflow.rules.forEachIndexed { idx, rule ->
             if (rule.target == "A") {
                 results.add(
                     buildBackTrackingList(
-                            reversedWorkflows,
-                            backtrackingIndex,
-                            currentKey = key,
-                            hitIdx = idx
-                        )
-                        // First item in the list (last item in the rules) should be true
-                        .also { it[0].truthful = true }
+                        reversedWorkflows,
+                        backtrackingIndex,
+                        currentKey = key,
+                        hitIdx = idx,
+                    )
                 )
             }
         }
@@ -64,7 +58,7 @@ private fun initRange(): MutableMap<String, IntRange> =
         "s" to MIN..MAX,
     )
 
-private fun List<BackTrackingRule>.computeRange(): Long {
+fun List<BackTrackingRule>.computeRange(): Long {
     val finalRange =
         this.fold(initRange()) { prevRange, brule ->
             val rule = brule.rule
@@ -76,20 +70,14 @@ private fun List<BackTrackingRule>.computeRange(): Long {
                     when (rule.operator) {
                         Operator.gt -> {
                             if (truthful) {
-                                if (rule.value < oldRange.first) {
-                                    prevRange
-                                } else if (oldRange.last < rule.value) {
-                                    prevRange[rule.cat] = MAX..MIN
+                                if (rule.value <= oldRange.first) {
                                     prevRange
                                 } else {
-                                    prevRange[rule.cat] = rule.value..oldRange.last
+                                    prevRange[rule.cat] = rule.value + 1..oldRange.last
                                     prevRange
                                 }
                             } else {
-                                if (rule.value < oldRange.first) {
-                                    prevRange[rule.cat] = MAX..MIN
-                                    prevRange
-                                } else if (oldRange.last < rule.value) {
+                                if (oldRange.last < rule.value) {
                                     prevRange
                                 } else {
                                     prevRange[rule.cat] = oldRange.first..rule.value
@@ -99,21 +87,14 @@ private fun List<BackTrackingRule>.computeRange(): Long {
                         }
                         Operator.lt -> {
                             if (truthful) {
-                                if (rule.value < oldRange.first) {
-                                    prevRange[rule.cat] = MAX..MIN
-                                    prevRange
-                                } else if (oldRange.last < rule.value) {
+                                if (oldRange.last < rule.value) {
                                     prevRange
                                 } else {
-                                    prevRange[rule.cat] = oldRange.first..rule.value
+                                    prevRange[rule.cat] = oldRange.first ..< rule.value
                                     prevRange
                                 }
                             } else {
-
                                 if (rule.value < oldRange.first) {
-                                    prevRange
-                                } else if (oldRange.last < rule.value) {
-                                    prevRange[rule.cat] = MAX..MIN
                                     prevRange
                                 } else {
                                     prevRange[rule.cat] = rule.value..oldRange.last
@@ -145,11 +126,11 @@ private fun buildBackTrackingList(
     workflows: Workflows, // reversed!
     backtrackingIndex: Map<String, List<Pair<String, Int>>>,
     currentKey: String,
-    hitIdx: Int
+    hitIdx: Int,
 ): List<BackTrackingRule> {
     val currentWorkflow = workflows[currentKey]!!
     val size = currentWorkflow.rules.size
-    val xs = (hitIdx ..< size).map { BackTrackingRule(currentWorkflow.rules[it], false) }
+    val xs = (hitIdx ..< size).map { BackTrackingRule(currentWorkflow.rules[it], it == hitIdx) }
     val ys =
         if (currentKey == "in") listOf()
         else
@@ -168,16 +149,9 @@ private fun MPart.passWorkflows(workflows: Workflows, nextWorkflow: String = "in
         val pass =
             when (rule) {
                 is Rule -> {
-                    when (rule.cat to rule.operator) {
-                        "x" to Operator.gt -> this.x > rule.value
-                        "x" to Operator.lt -> this.x < rule.value
-                        "m" to Operator.gt -> this.m > rule.value
-                        "m" to Operator.lt -> this.m < rule.value
-                        "a" to Operator.gt -> this.a > rule.value
-                        "a" to Operator.lt -> this.a < rule.value
-                        "s" to Operator.gt -> this.s > rule.value
-                        "s" to Operator.lt -> this.s < rule.value
-                        else -> false
+                    when (rule.operator) {
+                        Operator.gt -> this[rule.cat]!! > rule.value
+                        Operator.lt -> this[rule.cat]!! < rule.value
                     }
                 }
                 is DefaultRule -> {
@@ -232,25 +206,25 @@ private val partRegexp = """\{x=(\d+),m=(\d+),a=(\d+),s=(\d+)\}""".toRegex()
 
 private fun String.parsePart(): MPart {
     val (x, m, a, s) = partRegexp.find(this)?.groupValues?.drop(1)?.map { it.toInt() }!!
-    return MPart(x = x, m = m, a = a, s = s)
+    return mapOf("x" to x, "m" to m, "a" to a, "s" to s)
 }
 
-private data class MPart(val x: Int, val m: Int, val a: Int, val s: Int) {
-    fun score(): Int = x + m + a + s
-}
+private typealias MPart = Map<String, Int>
+
+private fun MPart.score() = values.sum()
 
 sealed interface RuleBase {
     val target: String
 }
 
-private data class Rule(
+data class Rule(
     val cat: String,
     val operator: Operator,
     val value: Int,
     override val target: String
 ) : RuleBase
 
-private data class DefaultRule(override val target: String) : RuleBase
+data class DefaultRule(override val target: String) : RuleBase
 
 private data class Workflow(val key: String, val rules: List<RuleBase>)
 
@@ -259,7 +233,7 @@ private enum class EndState {
     REJECTED
 }
 
-private enum class Operator {
+enum class Operator {
     gt,
     lt
 }
