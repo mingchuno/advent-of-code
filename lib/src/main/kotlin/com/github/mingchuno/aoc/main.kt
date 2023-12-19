@@ -5,7 +5,7 @@ import kotlinx.coroutines.runBlocking
 
 fun main() {
     runBlocking {
-        val ans = Day17.computePart1("2023/day17-example.txt")
+        val ans = Day17.computePart2("2023/day17-real.txt")
         println("Ans=$ans")
     }
 }

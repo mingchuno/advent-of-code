@@ -2,6 +2,7 @@ package com.github.mingchuno.aoc.y2023
 
 import io.kotest.core.spec.style.DescribeSpec
 import io.kotest.datatest.withData
+import io.kotest.matchers.ints.shouldBeLessThan
 import io.kotest.matchers.shouldBe
 
 class Day17Test :
@@ -20,6 +21,8 @@ class Day17Test :
             }
         }
 
+        // ~3 mins run time
+        // ~432ms run tim
         describe("part 1 real") {
             it("real case") { Day17.computePart1("2023/day17-real.txt").shouldBe(1138) }
         }
@@ -30,6 +33,7 @@ class Day17Test :
         }
 
         describe("part 2 real") {
-            it("real case") { Day17.computePart2("2023/day17-real.txt").shouldBe(0) }
+            it("real case") { Day17.computePart2("2023/day17-real.txt").shouldBeLessThan(1320) }
         }
+        // too high : 1320
     })

@@ -2,6 +2,7 @@ package com.github.mingchuno.aoc.y2023
 
 import com.github.mingchuno.aoc.interfaceing.Problem
 import com.github.mingchuno.aoc.utils.*
+import java.util.*
 
 object Day17 : Problem<Int> {
     override fun computePart1(inputFile: String): Int {
@@ -23,14 +24,46 @@ private data class GraphNode(
 
 private val ALL_DIRECTION = listOf(Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT)
 
-private class Dijkstra(
+private class PriorityMap<K, V>(comparator: Comparator<Pair<K, V>>) {
+    private val map: MutableMap<K, V> = mutableMapOf()
+    private val q: PriorityQueue<Pair<K, V>> = PriorityQueue(comparator)
+
+    fun add(k: K, v: V): V? {
+        q.add(k to v)
+        return map.put(k, v)
+    }
+
+    fun isEmpty(): Boolean = map.isEmpty()
+
+    fun isNotEmpty(): Boolean = map.isNotEmpty()
+
+    fun poll(): Pair<K, V> {
+        val pair = q.poll()
+        val (k, _) = pair
+        map.remove(k)
+        return pair
+    }
+
+    fun replace(k: K, v: V) {
+        val oldV = map[k]
+        q.remove(k to oldV)
+        q.add(k to v)
+        map[k] = v
+    }
+
+    fun get(k: K): V? = map[k]
+}
+
+class Dijkstra(
     private val graph: List<List<Int>>,
     private val minSteps: Int = 0,
     private val maxSteps: Int = 3
 ) {
     private val X = graph.first().size
     private val Y = graph.size
-    private val costs: MutableMap<GraphNode, Int> = mutableMapOf()
+    private val costs: PriorityMap<GraphNode, Int> = PriorityMap { a, b ->
+        a.second.compareTo(b.second)
+    }
     private val prevNode: MutableMap<GraphNode, GraphNode> = mutableMapOf()
     private val visited: MutableMap<GraphNode, Boolean> = mutableMapOf()
 
@@ -39,7 +72,6 @@ private class Dijkstra(
         // Init graph state for Dijkstra
         for (x in 0 ..< X) {
             for (y in 0 ..< Y) {
-                val cost = if (x == 0 && y == 0) 0 else Int.MAX_VALUE
                 val nodes =
                     if (x == 0 && y == 0) { // top left
                         listOf(Direction.RIGHT, Direction.DOWN /* doesn't matter */).map { d ->
@@ -54,12 +86,10 @@ private class Dijkstra(
                             (1..maxSteps).map { s -> GraphNode(x to y, d, s) }
                         }
                     }
-                nodes.forEach {
-                    costs[it] = cost
-                    visited[it] = false
-                }
+                nodes.forEach { visited[it] = false }
             }
         }
+        costs.add(GraphNode(0 to 0, Direction.RIGHT, 0), 0)
     }
 
     private fun printPath(start: GraphNode) {
@@ -75,19 +105,18 @@ private class Dijkstra(
 
     fun shortestPath(): Int {
         while (costs.isNotEmpty()) {
-            val (node, cost) = costs.minBy { (_, cost) -> cost }
+            val (node, cost) = costs.poll()
             val (nX, nY) = node.coord
-            costs.remove(node)
             if (nX + 1 == X && nY + 1 == Y) {
                 return cost
             }
             val neighbors = findNeighbors(node)
             neighbors.forEach { neighbor ->
                 val (x, y) = neighbor.coord
+                val oldCost = costs.get(neighbor) ?: Int.MAX_VALUE
                 val newCost = graph[y][x] + cost
-                val oldCost = costs[neighbor]!!
                 if (newCost < oldCost) {
-                    costs[neighbor] = newCost
+                    costs.add(neighbor, newCost)
                     prevNode[neighbor] = node
                 }
             }
