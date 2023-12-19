@@ -1,20 +1,17 @@
 package com.github.mingchuno.aoc.y2023
 
 import com.github.mingchuno.aoc.interfaceing.Problem
-import com.github.mingchuno.aoc.utils.Coord
-import com.github.mingchuno.aoc.utils.Direction
-import com.github.mingchuno.aoc.utils.opposite
-import com.github.mingchuno.aoc.utils.readFileFromResource
+import com.github.mingchuno.aoc.utils.*
 
 object Day17 : Problem<Int> {
     override fun computePart1(inputFile: String): Int {
         val inputs = inputFile.readFileFromResource().parseInput()
-        return DijkstraV2(inputs).shortestPath()
+        return Dijkstra(inputs).shortestPath()
     }
 
     override fun computePart2(inputFile: String): Int {
         val inputs = inputFile.readFileFromResource().parseInput()
-        return DijkstraV2(inputs, minSteps = 4, maxSteps = 10).shortestPath()
+        return Dijkstra(inputs, minSteps = 4, maxSteps = 10).shortestPath()
     }
 }
 
@@ -26,7 +23,7 @@ private data class GraphNode(
 
 private val ALL_DIRECTION = listOf(Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT)
 
-private class DijkstraV2(
+private class Dijkstra(
     private val graph: List<List<Int>>,
     private val minSteps: Int = 0,
     private val maxSteps: Int = 3
@@ -39,19 +36,20 @@ private class DijkstraV2(
 
     init {
         assert(minSteps < maxSteps)
+        // Init graph state for Dijkstra
         for (x in 0 ..< X) {
             for (y in 0 ..< Y) {
                 val cost = if (x == 0 && y == 0) 0 else Int.MAX_VALUE
                 val nodes =
-                    if (x == 0 && y == 0) {
+                    if (x == 0 && y == 0) { // top left
                         listOf(Direction.RIGHT, Direction.DOWN /* doesn't matter */).map { d ->
                             GraphNode(0 to 0, d, 0)
                         }
-                    } else if (x + 1 == X && y + 1 == Y) {
+                    } else if (x + 1 == X && y + 1 == Y) { // bottom right
                         listOf(Direction.RIGHT, Direction.DOWN /* matter */).flatMap { d ->
                             (minSteps..maxSteps).map { s -> GraphNode(x to y, d, s) }
                         }
-                    } else {
+                    } else { // others
                         ALL_DIRECTION.flatMap { d ->
                             (1..maxSteps).map { s -> GraphNode(x to y, d, s) }
                         }
@@ -65,9 +63,8 @@ private class DijkstraV2(
     }
 
     private fun printPath(start: GraphNode) {
-        val (x, y) = start.coord
         println(start)
-        if (x == 0 && y == 0) {
+        if (start.coord.atOrigin()) {
             return
         }
         val prev = prevNode[start]

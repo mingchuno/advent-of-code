@@ -4,6 +4,11 @@ typealias Coord = Pair<Int, Int>
 
 typealias LongCoord = Pair<Long, Long>
 
+fun Coord.atOrigin(): Boolean {
+    val (x, y) = this
+    return x == 0 && y == 0
+}
+
 enum class Direction {
     UP,
     DOWN,

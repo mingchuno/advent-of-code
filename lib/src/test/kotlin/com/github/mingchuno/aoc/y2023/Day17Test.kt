@@ -6,7 +6,7 @@ import io.kotest.matchers.shouldBe
 
 class Day17Test :
     DescribeSpec({
-        describe("part 1 example case") {
+        describe("part 1 example") {
             withData(
                 nameFn = { (file, expected) -> "$file shortest path is $expected" },
                 "2023/day17-example.txt" to 102,
@@ -20,14 +20,16 @@ class Day17Test :
             }
         }
 
-        describe("part 1") {
+        describe("part 1 real") {
             it("real case") { Day17.computePart1("2023/day17-real.txt").shouldBe(1138) }
         }
 
-        describe("part 2") {
+        describe("part 2 example") {
             it("example case") { Day17.computePart2("2023/day17-example.txt").shouldBe(94) }
             it("example case part 2") { Day17.computePart2("2023/day17-example7.txt").shouldBe(71) }
+        }
 
+        describe("part 2 real") {
             it("real case") { Day17.computePart2("2023/day17-real.txt").shouldBe(0) }
         }
     })
