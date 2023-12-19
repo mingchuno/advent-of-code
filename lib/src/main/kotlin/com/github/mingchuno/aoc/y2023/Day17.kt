@@ -33,8 +33,6 @@ private class PriorityMap<K, V>(comparator: Comparator<Pair<K, V>>) {
         return map.put(k, v)
     }
 
-    fun isEmpty(): Boolean = map.isEmpty()
-
     fun isNotEmpty(): Boolean = map.isNotEmpty()
 
     fun poll(): Pair<K, V> {
@@ -42,13 +40,6 @@ private class PriorityMap<K, V>(comparator: Comparator<Pair<K, V>>) {
         val (k, _) = pair
         map.remove(k)
         return pair
-    }
-
-    fun replace(k: K, v: V) {
-        val oldV = map[k]
-        q.remove(k to oldV)
-        q.add(k to v)
-        map[k] = v
     }
 
     fun get(k: K): V? = map[k]
@@ -74,11 +65,9 @@ class Dijkstra(
             for (y in 0 ..< Y) {
                 val nodes =
                     if (x == 0 && y == 0) { // top left
-                        listOf(Direction.RIGHT, Direction.DOWN /* doesn't matter */).map { d ->
-                            GraphNode(0 to 0, d, 0)
-                        }
+                        listOf(Direction.RIGHT, Direction.DOWN).map { d -> GraphNode(0 to 0, d, 0) }
                     } else if (x + 1 == X && y + 1 == Y) { // bottom right
-                        listOf(Direction.RIGHT, Direction.DOWN /* matter */).flatMap { d ->
+                        listOf(Direction.RIGHT, Direction.DOWN).flatMap { d ->
                             (minSteps..maxSteps).map { s -> GraphNode(x to y, d, s) }
                         }
                     } else { // others
@@ -89,7 +78,9 @@ class Dijkstra(
                 nodes.forEach { visited[it] = false }
             }
         }
-        costs.add(GraphNode(0 to 0, Direction.RIGHT, 0), 0)
+        listOf(Direction.RIGHT, Direction.DOWN)
+            .map { GraphNode(0 to 0, it, 0) }
+            .forEach { costs.add(it, 0) }
     }
 
     private fun printPath(start: GraphNode) {
