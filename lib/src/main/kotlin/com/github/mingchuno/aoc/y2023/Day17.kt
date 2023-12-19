@@ -14,7 +14,7 @@ object Day17 : Problem<Int> {
 
     override fun computePart2(inputFile: String): Int {
         val inputs = inputFile.readFileFromResource().parseInput()
-        TODO("Not yet implemented")
+        return DijkstraV2(inputs, minSteps = 4, maxSteps = 10).shortestPath()
     }
 }
 
@@ -26,7 +26,11 @@ private data class GraphNode(
 
 private val ALL_DIRECTION = listOf(Direction.UP, Direction.DOWN, Direction.LEFT, Direction.RIGHT)
 
-private class DijkstraV2(private val graph: List<List<Int>>) {
+private class DijkstraV2(
+    private val graph: List<List<Int>>,
+    private val minSteps: Int = 0,
+    private val maxSteps: Int = 3
+) {
     private val X = graph.first().size
     private val Y = graph.size
     private val costs: MutableMap<GraphNode, Int> = mutableMapOf()
@@ -34,6 +38,7 @@ private class DijkstraV2(private val graph: List<List<Int>>) {
     private val visited: MutableMap<GraphNode, Boolean> = mutableMapOf()
 
     init {
+        assert(minSteps < maxSteps)
         for (x in 0 ..< X) {
             for (y in 0 ..< Y) {
                 val cost = if (x == 0 && y == 0) 0 else Int.MAX_VALUE
@@ -42,8 +47,14 @@ private class DijkstraV2(private val graph: List<List<Int>>) {
                         listOf(Direction.RIGHT, Direction.DOWN /* doesn't matter */).map { d ->
                             GraphNode(0 to 0, d, 0)
                         }
+                    } else if (x + 1 == X && y + 1 == Y) {
+                        listOf(Direction.RIGHT, Direction.DOWN /* matter */).flatMap { d ->
+                            (minSteps..maxSteps).map { s -> GraphNode(x to y, d, s) }
+                        }
                     } else {
-                        ALL_DIRECTION.flatMap { d -> (1..3).map { s -> GraphNode(x to y, d, s) } }
+                        ALL_DIRECTION.flatMap { d ->
+                            (1..maxSteps).map { s -> GraphNode(x to y, d, s) }
+                        }
                     }
                 nodes.forEach {
                     costs[it] = cost
@@ -70,7 +81,7 @@ private class DijkstraV2(private val graph: List<List<Int>>) {
             val (node, cost) = costs.minBy { (_, cost) -> cost }
             val (nX, nY) = node.coord
             costs.remove(node)
-            if (nX + 1 == X && nY + 1 == Y) { // FIXME: condition is correct?
+            if (nX + 1 == X && nY + 1 == Y) {
                 return cost
             }
             val neighbors = findNeighbors(node)
@@ -106,12 +117,15 @@ private class DijkstraV2(private val graph: List<List<Int>>) {
         fromDir: Direction,
         stepsBeforeLastTurn: Int
     ): GraphNode? {
+        if (stepsBeforeLastTurn < minSteps && travelDir != fromDir) {
+            return null // You shall not turn!
+        }
         val newSteps = if (travelDir == fromDir) stepsBeforeLastTurn + 1 else 1
         val node = GraphNode(x to y, travelDir, newSteps)
         return if (
             x in 0 ..< X &&
                 y in 0 ..< Y &&
-                newSteps <= 3 &&
+                newSteps <= maxSteps &&
                 fromDir.opposite() != travelDir &&
                 (visited[node] == false)
         ) {

@@ -25,7 +25,8 @@ class Day17Test :
         }
 
         describe("part 2") {
-            it("example case") { Day17.computePart2("2023/day17-example.txt").shouldBe(0) }
+            it("example case") { Day17.computePart2("2023/day17-example.txt").shouldBe(94) }
+            it("example case part 2") { Day17.computePart2("2023/day17-example7.txt").shouldBe(71) }
 
             it("real case") { Day17.computePart2("2023/day17-real.txt").shouldBe(0) }
         }
