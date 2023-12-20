@@ -21,7 +21,7 @@ object Day19 : Problem<Long> {
 }
 
 private fun revereRulesTracking(workflows: Workflows): List<List<BackTrackingRule>> {
-    val reversedWorkflows = workflows.mapValues { (k, v) -> v.copy(rules = v.rules.reversed()) }
+    val reversedWorkflows = workflows.mapValues { (_, v) -> v.copy(rules = v.rules.reversed()) }
     val backtrackingIndex = findKeyAndHitIndex(reversedWorkflows)
     val results = mutableListOf<List<BackTrackingRule>>()
     reversedWorkflows.forEach { (key, workflow) ->
@@ -41,8 +41,8 @@ private fun revereRulesTracking(workflows: Workflows): List<List<BackTrackingRul
     return results
 }
 
-private val MIN = 1
-private val MAX = 4000
+private const val MIN = 1
+private const val MAX = 4000
 
 private fun List<BackTrackingRule>.computeRange(): Long {
     val initRange =
