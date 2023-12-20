@@ -58,6 +58,10 @@ class FlipFlopModule(
             Pulse.HIGH -> {}
         }
     }
+
+    override fun toString(): String {
+        return "FLIP(self=$self,output=$output)"
+    }
 }
 
 class ConjunctionModule(
@@ -69,9 +73,16 @@ class ConjunctionModule(
 
     private var state = mutableMapOf<String, Pulse>()
 
+    companion object {
+        const val SPECIAL_MODULE = "lb"
+    }
+
     fun setInputsAndInit(input: Set<String>) {
         this.input = input
         this.state = input.associateWith { Pulse.LOW }.toMutableMap()
+        if (self == SPECIAL_MODULE) {
+            mailingRoom.initStateForPart2(this.state.mapValues { -1L }.toMutableMap())
+        }
     }
 
     override fun isAtInitialState(): Boolean {
@@ -79,9 +90,22 @@ class ConjunctionModule(
     }
 
     override fun receivePulse(pulse: Pulse, from: String) {
+        // special for part 2
+        if (
+            state[from] != pulse && self == SPECIAL_MODULE && mailingRoom.part2State()[from]!! < 0
+        ) {
+            println(
+                "buttonPressCount=${mailingRoom.buttonPressCount()};from=${from};pulse=${pulse}"
+            )
+            mailingRoom.setPart2Count(from)
+        }
         state[from] = pulse
         val allHigh = state.all { (_, p) -> p == Pulse.HIGH }
         sendPulseDown(if (allHigh) Pulse.LOW else Pulse.HIGH)
+    }
+
+    override fun toString(): String {
+        return "CON(self=${self},output=$output)"
     }
 }
 
@@ -96,6 +120,10 @@ class BroadcastModule(
     override fun receivePulse(pulse: Pulse, from: String) {
         sendPulseDown(pulse)
     }
+
+    override fun toString(): String {
+        return "BROADCAST(output=$output)"
+    }
 }
 
 data class Mail(val to: String, val pulse: Pulse, val from: String)
@@ -109,11 +137,22 @@ class CentralMailingRoom {
     private var highCount = 0L
     private var lowCount = 0L
     private var buttonPressCount = 0L
+    private var stateForPart2 = mutableMapOf<String, Long>()
 
-    private fun resetCount() {
-        highCount = 0
-        lowCount = 0
-        buttonPressCount = 0
+    fun initStateForPart2(state: MutableMap<String, Long>) {
+        stateForPart2 = state
+    }
+
+    fun part2State(): MutableMap<String, Long> = stateForPart2
+
+    fun setPart2Count(key: String) {
+        stateForPart2[key] = buttonPressCount
+    }
+
+    private fun part2Terminate(): Boolean = stateForPart2.all { (_, v) -> v > 0 }
+
+    fun buttonPressCount(): Long {
+        return buttonPressCount
     }
 
     private fun pressButton() {
@@ -140,37 +179,27 @@ class CentralMailingRoom {
             val mail = q.remove()
             if (mail.pulse == Pulse.HIGH) highCount++
             if (mail.pulse == Pulse.LOW) lowCount++
-            //            println("from=${mail.from};pulse=${mail.pulse};to=${mail.to}")
             modules[mail.to]?.receivePulse(mail.pulse, mail.from)
         }
     }
 
-    private fun backToStartingState(): Boolean = modules.all { (_, m) -> m.isAtInitialState() }
-
-    private val COUNT = 1000
+    companion object {
+        private const val COUNT = 1000
+    }
 
     fun selfTrigger(): Long {
         loop@ while (buttonPressCount < COUNT) {
             pressButton()
             processMail()
-            if (backToStartingState()) {
-                break@loop
-            }
         }
-        println("buttonPressCount=$buttonPressCount;lowCount=$lowCount;highCount=$highCount")
-        val l = lowCount
-        val h = highCount
-        val remainingCount = COUNT.mod(buttonPressCount)
-        val q = COUNT / buttonPressCount
-        // reset -------------
-        resetCount()
-        for (i in 1..remainingCount) {
+        return lowCount * highCount
+    }
+
+    fun triggerPart2(): Long {
+        loop@ while (!part2Terminate()) {
             pressButton()
             processMail()
         }
-        println("buttonPressCount=$buttonPressCount;lowCount=$lowCount;highCount=$highCount")
-        val low = q * l + lowCount
-        val high = q * h + highCount
-        return low * high
+        return stateForPart2.values.reduce { acc, l -> acc * l }
     }
 }

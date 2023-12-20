@@ -13,12 +13,10 @@ class Day20Test :
                 Day20.computePart1("2023/day20-example2.txt").shouldBe(11687500)
             }
 
-            it("real case") { Day20.computePart1("2023/day20-real.txt").shouldBe(0) }
+            it("real case") { Day20.computePart1("2023/day20-real.txt").shouldBe(817896682) }
         }
 
         describe("part 2") {
-            it("example case") { Day20.computePart2("2023/day20-example1.txt").shouldBe(0) }
-
-            it("real case") { Day20.computePart2("2023/day20-real.txt").shouldBe(0) }
+            it("real case") { Day20.computePart2("2023/day20-real.txt").shouldBe(250924073918341L) }
         }
     })

@@ -16,7 +16,12 @@ object Day20 : Problem<Long> {
 
     override fun computePart2(inputFile: String): Long {
         val inputs = inputFile.readFileFromResource()
-        TODO("Not yet implemented")
+        // parse and prep state
+        val mailingRoom = CentralMailingRoom()
+        val modules = inputs.map { it.parseModule(mailingRoom) }
+        mailingRoom.registerModules(modules)
+        // start the loop
+        return mailingRoom.triggerPart2()
     }
 }
 
