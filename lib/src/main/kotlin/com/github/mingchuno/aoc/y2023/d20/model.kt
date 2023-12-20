@@ -1,5 +1,6 @@
 package com.github.mingchuno.aoc.y2023.d20
 
+import com.github.mingchuno.aoc.utils.product
 import java.util.*
 
 sealed interface Module {
@@ -33,7 +34,9 @@ class FlipFlopModule(
     override val mailingRoom: CentralMailingRoom
 ) : Module {
 
-    private val initialState = OnOffState.OFF
+    companion object {
+        private val initialState = OnOffState.OFF
+    }
 
     private var state: OnOffState = initialState
 
@@ -69,8 +72,6 @@ class ConjunctionModule(
     override val output: List<String>,
     override val mailingRoom: CentralMailingRoom
 ) : Module {
-    private var input: Set<String> = setOf()
-
     private var state = mutableMapOf<String, Pulse>()
 
     companion object {
@@ -78,10 +79,9 @@ class ConjunctionModule(
     }
 
     fun setInputsAndInit(input: Set<String>) {
-        this.input = input
         this.state = input.associateWith { Pulse.LOW }.toMutableMap()
         if (self == SPECIAL_MODULE) {
-            mailingRoom.initStateForPart2(this.state.mapValues { -1L }.toMutableMap())
+            mailingRoom.initStateForPart2(this.state.mapValues { -1L })
         }
     }
 
@@ -91,9 +91,9 @@ class ConjunctionModule(
 
     override fun receivePulse(pulse: Pulse, from: String) {
         // special for part 2
-        if (
+        val shouldRegisterPart2Count =
             state[from] != pulse && self == SPECIAL_MODULE && mailingRoom.part2State()[from]!! < 0
-        ) {
+        if (shouldRegisterPart2Count) {
             println(
                 "buttonPressCount=${mailingRoom.buttonPressCount()};from=${from};pulse=${pulse}"
             )
@@ -132,18 +132,18 @@ data class Mail(val to: String, val pulse: Pulse, val from: String)
 class CentralMailingRoom {
     private val q = LinkedList<Mail>()
 
-    private var modules = mutableMapOf<String, Module>()
+    private var modules = mapOf<String, Module>()
 
     private var highCount = 0L
     private var lowCount = 0L
     private var buttonPressCount = 0L
     private var stateForPart2 = mutableMapOf<String, Long>()
 
-    fun initStateForPart2(state: MutableMap<String, Long>) {
-        stateForPart2 = state
+    fun initStateForPart2(state: Map<String, Long>) {
+        stateForPart2 = state.toMutableMap()
     }
 
-    fun part2State(): MutableMap<String, Long> = stateForPart2
+    fun part2State(): Map<String, Long> = stateForPart2
 
     fun setPart2Count(key: String) {
         stateForPart2[key] = buttonPressCount
@@ -161,7 +161,7 @@ class CentralMailingRoom {
     }
 
     fun registerModules(modules: List<Module>) {
-        val map = modules.associateBy { it.self }.toMutableMap()
+        val map = modules.associateBy { it.self }
         modules.filterIsInstance<ConjunctionModule>().forEach { con ->
             val inputs = modules.filter { it.output.contains(con.self) }.map { it.self }.toSet()
             con.setInputsAndInit(inputs)
@@ -175,7 +175,6 @@ class CentralMailingRoom {
 
     private fun processMail() {
         while (q.isNotEmpty()) {
-            // fire all the mail in this batch
             val mail = q.remove()
             if (mail.pulse == Pulse.HIGH) highCount++
             if (mail.pulse == Pulse.LOW) lowCount++
@@ -187,8 +186,9 @@ class CentralMailingRoom {
         private const val COUNT = 1000
     }
 
-    fun selfTrigger(): Long {
-        loop@ while (buttonPressCount < COUNT) {
+    fun triggerPart1(): Long {
+        assert(modules.isNotEmpty()) { "forgot to call registerModules?" }
+        while (buttonPressCount < COUNT) {
             pressButton()
             processMail()
         }
@@ -196,10 +196,11 @@ class CentralMailingRoom {
     }
 
     fun triggerPart2(): Long {
-        loop@ while (!part2Terminate()) {
+        assert(modules.isNotEmpty()) { "forgot to call registerModules?" }
+        while (!part2Terminate()) {
             pressButton()
             processMail()
         }
-        return stateForPart2.values.reduce { acc, l -> acc * l }
+        return stateForPart2.values.product()
     }
 }

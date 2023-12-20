@@ -1,6 +1,7 @@
 package com.github.mingchuno.aoc.y2023.d19
 
 import com.github.mingchuno.aoc.interfaceing.Problem
+import com.github.mingchuno.aoc.utils.product
 import com.github.mingchuno.aoc.utils.readFileFromResource
 
 object Day19 : Problem<Long> {
@@ -89,7 +90,7 @@ private fun List<BackTrackingRule>.computeRange(): Long {
             }
         }
     // compute all possible distinct combinations
-    return finalRange.values.map { it.count().toLong() }.reduce { acc, i -> acc * i }
+    return finalRange.values.map { it.count().toLong() }.product()
 }
 
 private fun findKeyAndHitIndex(

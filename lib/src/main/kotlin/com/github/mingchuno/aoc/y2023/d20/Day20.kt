@@ -11,7 +11,7 @@ object Day20 : Problem<Long> {
         val modules = inputs.map { it.parseModule(mailingRoom) }
         mailingRoom.registerModules(modules)
         // start the loop
-        return mailingRoom.selfTrigger()
+        return mailingRoom.triggerPart1()
     }
 
     override fun computePart2(inputFile: String): Long {
@@ -35,7 +35,7 @@ private fun String.parseModule(mailingRoom: CentralMailingRoom): Module {
         BroadcastModule(output = outputs, mailingRoom)
     } else if (this.contains("%")) {
         val (key, outputs) = this.findMatches(flipflopRegexp)
-        FlipFlopModule(self = key, output = outputs.parseOutputs(), mailingRoom)
+        FlipFlopModule(self = key, output = outputs.parseOutputs(), mailingRoom = mailingRoom)
     } else if (this.contains("&")) {
         val (key, outputs) = this.findMatches(conjunctionRegexp)
         ConjunctionModule(self = key, output = outputs.parseOutputs(), mailingRoom = mailingRoom)
@@ -47,4 +47,4 @@ private fun String.parseModule(mailingRoom: CentralMailingRoom): Module {
 private fun String.findMatches(regex: Regex): List<String> =
     regex.find(this)?.groupValues?.drop(1)!!
 
-private fun String.parseOutputs(): List<String> = this.split(",").map { it.trim() }
+private fun String.parseOutputs(): List<String> = split(",").map { it.trim() }
