@@ -25,26 +25,26 @@ object Day20 : Problem<Long> {
     }
 }
 
-private val broadcastRegexp = """broadcaster ->(.+)""".toRegex()
-private val flipflopRegexp = """\%(\w+) ->(.+)""".toRegex()
-private val conjunctionRegexp = """\&(\w+) ->(.+)""".toRegex()
-
 private fun String.parseModule(mailingRoom: CentralMailingRoom): Module {
     return if (this.contains("broadcaster")) {
-        val outputs = this.findMatches(broadcastRegexp).first().parseOutputs()
+        val (_, outputs) = findMatches(this)
         BroadcastModule(output = outputs, mailingRoom)
     } else if (this.contains("%")) {
-        val (key, outputs) = this.findMatches(flipflopRegexp)
-        FlipFlopModule(self = key, output = outputs.parseOutputs(), mailingRoom = mailingRoom)
+        val (key, outputs) = findMatches(this)
+        FlipFlopModule(self = key, output = outputs, mailingRoom = mailingRoom)
     } else if (this.contains("&")) {
-        val (key, outputs) = this.findMatches(conjunctionRegexp)
-        ConjunctionModule(self = key, output = outputs.parseOutputs(), mailingRoom = mailingRoom)
+        val (key, outputs) = findMatches(this)
+        ConjunctionModule(self = key, output = outputs, mailingRoom = mailingRoom)
     } else {
         throw Exception("This should not happen!")
     }
 }
 
-private fun String.findMatches(regex: Regex): List<String> =
-    regex.find(this)?.groupValues?.drop(1)!!
+private val parseRegex = """(\w+)""".toRegex()
 
-private fun String.parseOutputs(): List<String> = split(",").map { it.trim() }
+private fun findMatches(it: String): Pair<String, List<String>> {
+    val matches = parseRegex.findAll(it).map { it.value }.toList()
+    val key = matches.first()
+    val outputs = matches.drop(1)
+    return key to outputs
+}

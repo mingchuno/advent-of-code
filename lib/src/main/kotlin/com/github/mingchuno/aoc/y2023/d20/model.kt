@@ -75,7 +75,7 @@ class ConjunctionModule(
     private var state = mutableMapOf<String, Pulse>()
 
     companion object {
-        const val SPECIAL_MODULE = "lb"
+        const val SPECIAL_MODULE = "lb" // for part 2
     }
 
     fun setInputsAndInit(input: Set<String>) {
