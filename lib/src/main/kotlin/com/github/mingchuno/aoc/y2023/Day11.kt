@@ -1,6 +1,7 @@
 package com.github.mingchuno.aoc.y2023
 
 import com.github.mingchuno.aoc.utils.readFileFromResource
+import com.github.mingchuno.aoc.utils.to2DChars
 import com.github.mingchuno.aoc.utils.transpose
 import kotlin.math.abs
 
@@ -25,7 +26,7 @@ object Day11 {
     }
 
     fun computePart2(inputFile: String, expansionFactor: Int = 2 /* part 1 = 2*/): Long {
-        val inputs = inputFile.readFileFromResource().map { it.toList() }
+        val inputs = inputFile.readFileFromResource().to2DChars()
         val yIndexes = inputs.findExpandIndex()
         val xIndexes = inputs.transpose().findExpandIndex()
         return inputs.findGalaxies().findShortestDistance(xIndexes, yIndexes, expansionFactor).sum()

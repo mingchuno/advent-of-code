@@ -1,6 +1,7 @@
 package com.github.mingchuno.aoc.y2023.d20
 
 import com.github.mingchuno.aoc.interfaceing.Problem
+import com.github.mingchuno.aoc.utils.ThisShouldNotHappenException
 import com.github.mingchuno.aoc.utils.readFileFromResource
 
 object Day20 : Problem<Long> {
@@ -36,7 +37,7 @@ private fun String.parseModule(mailingRoom: CentralMailingRoom): Module {
         val (key, outputs) = findMatches(this)
         ConjunctionModule(self = key, output = outputs, mailingRoom = mailingRoom)
     } else {
-        throw Exception("This should not happen!")
+        throw ThisShouldNotHappenException()
     }
 }
 

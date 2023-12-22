@@ -94,7 +94,7 @@ class Dijkstra(
             }
             visited.add(node)
         }
-        throw Exception("This should not happens")
+        throw ThisShouldNotHappenException()
     }
 
     private fun findNeighbors(node: GraphNode): List<GraphNode> {

@@ -1,6 +1,7 @@
 package com.github.mingchuno.aoc.y2023
 
 import com.github.mingchuno.aoc.interfaceing.Problem
+import com.github.mingchuno.aoc.utils.ThisShouldNotHappenException
 import com.github.mingchuno.aoc.utils.readFileFromResource
 
 class SpringConfigV2(_springs: String, _damaged: String, private val scale: Int) {
@@ -119,7 +120,7 @@ class SpringConfig(private val scale: Int) {
                 possibleConfigMemo(springs.replaceFirst('.'), damagedCount) +
                     possibleConfigMemo(springs.replaceFirst('#'), damagedCount)
             }
-            else -> throw Exception("This should not happens")
+            else -> throw ThisShouldNotHappenException()
         }
     }
 

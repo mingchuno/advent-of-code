@@ -2,6 +2,7 @@
 package com.github.mingchuno.aoc.y2023
 
 import com.github.mingchuno.aoc.interfaceing.Problem
+import com.github.mingchuno.aoc.utils.ThisShouldNotHappenException
 import com.github.mingchuno.aoc.utils.readFileFromResource
 
 object Day7 : Problem<Int> {
@@ -43,7 +44,8 @@ data class Hand(val hand: String, val bid: Int) {
         else if (_mapValues.filter { it == 3 }.size == 1) THREE_OF_A_KIND
         else if (_mapValues.filter { it == 2 }.size == 2) TWO_PAIRS
         else if (_mapValues.filter { it == 2 }.size == 1) ONE_PAIR
-        else if (_mapValues.all { it == 1 }) HIGH_CARD else throw Exception("unknown hand:$hand")
+        else if (_mapValues.all { it == 1 }) HIGH_CARD
+        else throw ThisShouldNotHappenException("unknown hand:$hand")
 
     val part2RankNumber: Int by lazy {
         val jokerCount = hand.count { it == 'J' }
@@ -58,15 +60,15 @@ data class Hand(val hand: String, val bid: Int) {
                 if (_mapWithoutJValues.any { it == 3 }) FIVE_OF_A_KIND /*2,3*/
                 else if (_mapWithoutJValues.any { it == 2 }) FOURTH_OF_A_KIND /*2,2,1*/
                 else if (_mapWithoutJValues.all { it == 1 }) THREE_OF_A_KIND /*2,1,1,1*/
-                else throw Exception("unknown hand:$hand")
+                else throw ThisShouldNotHappenException("unknown hand:$hand")
             1 ->
                 if (_mapWithoutJValues.any { it == 4 }) FIVE_OF_A_KIND /*1,4*/
                 else if (_mapWithoutJValues.any { it == 3 }) FOURTH_OF_A_KIND /*1,3,1*/
                 else if (_mapWithoutJValues.all { it == 2 }) FULL_HOUSE /*1,2,2*/
                 else if (_mapWithoutJValues.any { it == 2 }) THREE_OF_A_KIND /*1,2,1,1*/
                 else if (_mapWithoutJValues.all { it == 1 }) ONE_PAIR /*1,1,1,1,1*/
-                else throw Exception("unknown hand:$hand")
-            else -> throw Exception("unknown hand:$hand")
+                else throw ThisShouldNotHappenException("unknown hand:$hand")
+            else -> throw ThisShouldNotHappenException("unknown hand:$hand")
         }
     }
 
@@ -104,7 +106,7 @@ private fun Char.score(): Int {
         '4' -> 3
         '3' -> 2
         '2' -> 1
-        else -> throw Exception("unknown card:$this")
+        else -> throw ThisShouldNotHappenException("unknown card:$this")
     }
 }
 
@@ -123,7 +125,7 @@ private fun Char.jokerScore(): Int {
         '3' -> 3
         '2' -> 2
         'J' -> 1
-        else -> throw Exception("unknown card:$this")
+        else -> throw ThisShouldNotHappenException("unknown card:$this")
     }
 }
 

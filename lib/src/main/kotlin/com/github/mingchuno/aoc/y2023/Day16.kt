@@ -3,15 +3,16 @@ package com.github.mingchuno.aoc.y2023
 import com.github.mingchuno.aoc.interfaceing.Problem
 import com.github.mingchuno.aoc.utils.Direction
 import com.github.mingchuno.aoc.utils.readFileFromResource
+import com.github.mingchuno.aoc.utils.to2DChars
 
 object Day16 : Problem<Int> {
     override fun computePart1(inputFile: String): Int {
-        val inputs = inputFile.readFileFromResource().map { it.toList() }
+        val inputs = inputFile.readFileFromResource().to2DChars()
         return Contraption(inputs).computeEnergized()
     }
 
     override fun computePart2(inputFile: String): Int {
-        val inputs = inputFile.readFileFromResource().map { it.toList() }
+        val inputs = inputFile.readFileFromResource().to2DChars()
         return Contraption(inputs).findMaxEnergyConfigScore()
     }
 }

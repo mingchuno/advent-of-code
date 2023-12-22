@@ -1,6 +1,7 @@
 package com.github.mingchuno.aoc.y2023.d21
 
 import com.github.mingchuno.aoc.utils.Coord
+import com.github.mingchuno.aoc.utils.ThisShouldNotHappenException
 
 data class Node(val coord: Coord, val steps: Int)
 
@@ -69,5 +70,5 @@ private fun List<List<Char>>.findStartingPos(): Coord {
             }
         }
     }
-    throw Exception("This should not happen!")
+    throw ThisShouldNotHappenException()
 }

@@ -1,6 +1,7 @@
 package com.github.mingchuno.aoc.y2023.d19
 
 import com.github.mingchuno.aoc.interfaceing.Problem
+import com.github.mingchuno.aoc.utils.ThisShouldNotHappenException
 import com.github.mingchuno.aoc.utils.product
 import com.github.mingchuno.aoc.utils.readFileFromResource
 
@@ -143,7 +144,7 @@ private fun Part.passWorkflows(workflows: Workflows, nextWorkflow: String = "in"
         }
     }
     return when (nextTarget) {
-        null -> throw Exception("Should not happens")
+        null -> throw ThisShouldNotHappenException()
         "A" -> EndState.ACCEPTED
         "R" -> EndState.REJECTED
         else -> this.passWorkflows(workflows, nextTarget)

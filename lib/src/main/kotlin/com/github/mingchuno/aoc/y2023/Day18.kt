@@ -3,6 +3,7 @@ package com.github.mingchuno.aoc.y2023
 import com.github.mingchuno.aoc.interfaceing.Problem
 import com.github.mingchuno.aoc.utils.Direction
 import com.github.mingchuno.aoc.utils.LongCoord
+import com.github.mingchuno.aoc.utils.ThisShouldNotHappenException
 import com.github.mingchuno.aoc.utils.readFileFromResource
 import kotlin.math.abs
 
@@ -58,7 +59,7 @@ private data class Instruction(val direction: Direction, val steps: Int, val col
                 "1" -> Direction.DOWN
                 "2" -> Direction.LEFT
                 "3" -> Direction.UP
-                else -> throw Exception("This should not happens")
+                else -> throw ThisShouldNotHappenException()
             }
         return Instruction(newDirection, newSteps, color)
     }
@@ -74,7 +75,7 @@ private fun parseLine(instruction: String): Instruction {
             "L" -> Direction.LEFT
             "U" -> Direction.UP
             "D" -> Direction.DOWN
-            else -> throw Exception("Should not happens")
+            else -> throw ThisShouldNotHappenException()
         }
     val steps = stepStr.toInt()
     val color = colorStrRegexp.find(colorStr)?.groupValues?.last()!!

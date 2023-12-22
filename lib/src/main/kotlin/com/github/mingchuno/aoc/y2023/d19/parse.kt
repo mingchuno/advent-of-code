@@ -1,5 +1,7 @@
 package com.github.mingchuno.aoc.y2023.d19
 
+import com.github.mingchuno.aoc.utils.ThisShouldNotHappenException
+
 private val workflowRegex = """(.*)\{(.*)\}""".toRegex()
 private val ruleRegex = """([xmas])([>|<])(\d+):(.+)""".toRegex()
 
@@ -14,7 +16,7 @@ private fun String.parseWorkflow(): Workflow {
                 when (operator) {
                     ">" -> Operator.gt
                     "<" -> Operator.lt
-                    else -> throw Exception("Should not happens")
+                    else -> throw ThisShouldNotHappenException()
                 }
             Rule(cat, op, value.toInt(), target)
         }

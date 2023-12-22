@@ -2,6 +2,7 @@ package com.github.mingchuno.aoc.y2023
 
 import com.github.mingchuno.aoc.interfaceing.Problem
 import com.github.mingchuno.aoc.utils.readFileFromResource
+import com.github.mingchuno.aoc.utils.to2DChars
 import com.github.mingchuno.aoc.utils.transpose
 
 object Day14 : Problem<Int> {
@@ -18,7 +19,7 @@ object Day14 : Problem<Int> {
 
 /** Class that contain all the state and functions need for part 1 & 2 */
 class PlatformV2(platform: List<String>) {
-    private val charsMap = platform.map { it.toList() }
+    private val charsMap = platform.to2DChars()
 
     private val SIZE = platform.size
 

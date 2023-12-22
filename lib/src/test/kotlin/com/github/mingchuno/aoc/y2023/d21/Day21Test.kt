@@ -26,56 +26,29 @@ class Day21Test :
             }
         }
 
-        describe("part 2 real") {
-            describe("part 1") {
-                it("real case - 64") {
-                    Day21.computePart2("2023/day21-real.txt", 64).shouldBe(3562)
-                }
-            }
-
-            describe("55 * n") {
-                // 26501365 = 5 * 11 * 481843
-                it("real case - 55") {
-                    Day21.computePart2("2023/day21-real.txt", 55).shouldBe(2588)
-                }
-                it("real case - 110") {
-                    Day21.computePart2("2023/day21-real.txt", 110).shouldBe(10408)
-                }
-                it("real case - 165") {
-                    Day21.computePart2("2023/day21-real.txt", 165).shouldBe(23128)
-                }
-                it("real case - 166") {
-                    Day21.computePart2("2023/day21-real.txt", 166).shouldBe(23128)
-                }
-                it("real case - 220") {
-                    Day21.computePart2("2023/day21-real.txt", 220).shouldBe(41347)
-                }
-            }
-
+        describe("part 2 experiment") {
             describe("131 * n + 65") {
-                // 202300 * 131 + 65 = 26501365
-                // n = 0
-                it("real case - 65") {
-                    Day21.computePart2("2023/day21-real.txt", 65).shouldBe(3682)
-                }
-                // n = 1
-                it("real case - 196") {
-                    Day21.computePart2("2023/day21-real.txt", 196).shouldBe(32768)
-                }
-                // n = 2
-                it("real case - 327") {
-                    Day21.computePart2("2023/day21-real.txt", 327).shouldBe(90820)
-                }
-                // n = 3
-                it("real case - 458") {
-                    Day21.computePart2("2023/day21-real.txt", 458).shouldBe(177838)
+                // observe: 202300 * 131 + 65 = 26501365
+                withData(
+                    nameFn = { (n, expected) ->
+                        "131 * $n + 65 = ${131 * n + 65} steps => expected $expected"
+                    },
+                    0 to 3682,
+                    1 to 32768,
+                    2 to 90820,
+                    3 to 177838,
+                ) { (n, expected) ->
+                    val steps = 131 * n + 65
+                    Day21.computePart2("2023/day21-real.txt", steps).shouldBe(expected)
                 }
             }
-
-            //            it("real case - 26501365") {
-            //                Day21.computePart2("2023/day21-real.txt", 26501365).shouldBe(0)
-            //            }
         }
-        // 592723929260582!!!!
 
+        describe("Part 2 actual") {
+            // observe: 202300 * 131 + 65 = 26501365
+            it("real case - 26501365") {
+                Day21.computePart2Quadratic("2023/day21-real.txt", 202300)
+                    .shouldBe(592723929260582L)
+            }
+        }
     })

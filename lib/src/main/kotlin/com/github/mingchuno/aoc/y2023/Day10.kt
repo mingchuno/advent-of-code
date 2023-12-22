@@ -2,6 +2,7 @@ package com.github.mingchuno.aoc.y2023
 
 import com.github.mingchuno.aoc.interfaceing.Problem
 import com.github.mingchuno.aoc.utils.Direction
+import com.github.mingchuno.aoc.utils.ThisShouldNotHappenException
 import com.github.mingchuno.aoc.utils.opposite
 import com.github.mingchuno.aoc.utils.readFileFromResource
 
@@ -119,7 +120,7 @@ object Day10 : Problem<Int> {
                     }
                 }
             }
-            throw Exception("Starting pos not found!")
+            throw ThisShouldNotHappenException("Starting pos not found!")
         }
 
         private fun decideStartingChar(inputs: List<String>, startingPos: Pair<Int, Int>): Char {
@@ -146,7 +147,7 @@ object Day10 : Problem<Int> {
             } else if (right != null && bottom != null && right.inRight() && bottom.inBottom()) {
                 F
             } else {
-                throw Exception("Cannot decide starting pipe")
+                throw ThisShouldNotHappenException("Cannot decide starting pipe")
             }
         }
 
@@ -176,8 +177,8 @@ object Day10 : Problem<Int> {
             NW -> listOf(Direction.UP, Direction.LEFT)
             SW -> listOf(Direction.DOWN, Direction.LEFT)
             SE -> listOf(Direction.DOWN, Direction.RIGHT)
-            GROUND -> throw Exception("Should not arrive here!")
-            else -> throw Exception("current node is unknown:${this}")
+            GROUND -> throw ThisShouldNotHappenException()
+            else -> throw ThisShouldNotHappenException("Current node is unknown:${this}")
         }
     }
 

@@ -2,6 +2,7 @@ package com.github.mingchuno.aoc.y2023
 
 import com.github.mingchuno.aoc.interfaceing.Problem
 import com.github.mingchuno.aoc.utils.readFileFromResource
+import com.github.mingchuno.aoc.utils.to2DChars
 import com.github.mingchuno.aoc.utils.transpose
 import kotlin.math.abs
 
@@ -28,7 +29,7 @@ object Day13 : Problem<Int> {
             .sum()
     }
 
-    private fun List<String>.transpose(): List<List<Char>> = map { it.toList() }.transpose()
+    private fun List<String>.transpose(): List<List<Char>> = to2DChars().transpose()
 
     private fun parsePattern(inputs: List<String>): List<List<String>> {
         val results = mutableListOf<List<String>>()
