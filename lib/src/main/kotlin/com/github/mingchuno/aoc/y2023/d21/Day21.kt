@@ -10,7 +10,7 @@ object Day21 {
 
     fun computePart2(inputFile: String, maxSteps: Int): Int {
         val inputs = inputFile.readFileFromResource().toInputs()
-        TODO("Not yet implemented")
+        return BFSPart2(inputs, maxSteps).computePart2()
     }
 }
 
