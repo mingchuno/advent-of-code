@@ -5,12 +5,12 @@ import com.github.mingchuno.aoc.utils.readFileFromResource
 object Day21 {
     fun computePart1(inputFile: String, maxSteps: Int): Int {
         val inputs = inputFile.readFileFromResource().toInputs()
-        return BFS(inputs, maxSteps).computePart1()
+        return WalkGarden(inputs, maxSteps).walk()
     }
 
     fun computePart2(inputFile: String, maxSteps: Int): Int {
         val inputs = inputFile.readFileFromResource().toInputs()
-        return BFSPart2(inputs, maxSteps).computePart2()
+        return WalkInfiniteGarden(inputs, maxSteps).walk()
     }
 }
 

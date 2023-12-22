@@ -76,9 +76,6 @@ class Day21Test :
             //                Day21.computePart2("2023/day21-real.txt", 26501365).shouldBe(0)
             //            }
         }
-        // 602750650598082 too high
-        // 602747671120000 too high
-        // 81850175401
         // 592723929260582!!!!
 
     })
