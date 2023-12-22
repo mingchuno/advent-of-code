@@ -37,9 +37,10 @@ class Day22Test :
             }
         }
 
-        xdescribe("part 2") {
-            it("example case") { Day22.computePart2("2023/day22-example.txt").shouldBe(0) }
+        describe("part 2") {
+            it("example case") { Day22.computePart2("2023/day22-example.txt").shouldBe(7) }
 
-            it("real case") { Day22.computePart2("2023/day22-real.txt").shouldBe(0) }
+            it("real case") { Day22.computePart2("2023/day22-real.txt").shouldBe(79465) }
+            // 77613 too low
         }
     })

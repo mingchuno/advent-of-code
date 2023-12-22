@@ -52,21 +52,41 @@ class BrickResult {
 class Jenga(bricks: List<Brick>) {
     private val q = PriorityQueue<Brick> { o1, o2 -> o1.start.z - o2.start.z }
     private val brickResult = BrickResult()
+    private var moved = 0
 
     init {
         bricks.forEach { q.add(it) }
     }
 
     fun compute(): Int {
+        run()
+        // number of bricks that CAN be disintegrated
+        return brickResult.q.size - findSupporting().size
+    }
+
+    fun computePart2(): Int {
+        run()
+        val supporting = findSupporting()
+        return supporting.sumOf { brickToRemove ->
+            Jenga(brickResult.q.filter { it != brickToRemove }).computeMoved()
+        }
+    }
+
+    private fun run() {
         while (q.isNotEmpty()) {
             val brick = q.remove()
             val endBrick = findBrickEndPos(brick)
+            if (brick != endBrick) moved++
             brickResult.add(endBrick)
         }
-        checkValid()
-        return findSupporting()
     }
 
+    fun computeMoved(): Int {
+        run()
+        return moved
+    }
+
+    @Suppress("unused")
     private fun checkValid() {
         val temp = mutableSetOf<Position>()
         brickResult.q.forEach { brick ->
@@ -95,7 +115,7 @@ class Jenga(bricks: List<Brick>) {
         return brick.lowerToLevel(1)
     }
 
-    private fun findSupporting(): Int {
+    private fun findSupporting(): Set<Brick> {
         val bmap = brickResult.mapStartKey
         val amap = brickResult.mapEndKey
         val cannotBricks =
@@ -108,7 +128,6 @@ class Jenga(bricks: List<Brick>) {
                         .flatten()
                 }
                 .toSet()
-        // number of bricks that CAN be disintegrated
-        return brickResult.q.size - cannotBricks.size
+        return cannotBricks
     }
 }

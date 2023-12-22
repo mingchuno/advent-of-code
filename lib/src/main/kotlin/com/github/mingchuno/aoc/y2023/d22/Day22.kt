@@ -13,7 +13,8 @@ object Day22 : Problem<Int> {
 
     override fun computePart2(inputFile: String): Int {
         val inputs = inputFile.readFileFromResource()
-        TODO("Not yet implemented")
+        val bricks = inputs.map { it.parseBrick() }
+        return Jenga(bricks).computePart2()
     }
 }
 
