@@ -11,8 +11,6 @@ data class Position(val x: Int, val y: Int, val z: Int) {
 
 data class Brick(val start: Position, val end: Position) {
 
-    val horizontal: Boolean = start.z == end.z
-
     fun overlap(that: Brick): Boolean {
         val thisX = start.x..end.x
         val thisY = start.y..end.y
@@ -24,6 +22,7 @@ data class Brick(val start: Position, val end: Position) {
     fun lowerToLevel(z: Int): Brick = Brick(start.copy(z = z), end.copy(z = end.z - start.z + z))
 
     override fun toString(): String {
+        val horizontal = start.z == end.z
         val char = if (horizontal) "-" else "|"
         return "$start$char$end"
     }
@@ -49,7 +48,7 @@ class BrickResult {
     }
 }
 
-class Jenga(bricks: List<Brick>) {
+class Jenga(private val bricks: List<Brick>) {
     private val q = PriorityQueue<Brick> { o1, o2 -> o1.start.z - o2.start.z }
     private val brickResult = BrickResult()
     private var moved = 0
@@ -61,7 +60,7 @@ class Jenga(bricks: List<Brick>) {
     fun compute(): Int {
         run()
         // number of bricks that CAN be disintegrated
-        return brickResult.q.size - findSupporting().size
+        return bricks.size - findSupporting().size
     }
 
     fun computePart2(): Int {
