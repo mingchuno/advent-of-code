@@ -7,11 +7,11 @@ import com.github.mingchuno.aoc.utils.to2DChars
 object Day23 : Problem<Int> {
     override fun computePart1(inputFile: String): Int {
         val inputs = inputFile.readFileFromResource().to2DChars()
-        return WalkForest(inputs).longestPath()
+        return WalkForestDFSPart1(inputs).compute()
     }
 
     override fun computePart2(inputFile: String): Int {
         val inputs = inputFile.readFileFromResource().to2DChars()
-        TODO("Not yet implemented")
+        return WalkForestDFSPart2(inputs).compute()
     }
 }
