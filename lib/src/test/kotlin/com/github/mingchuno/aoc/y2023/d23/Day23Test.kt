@@ -15,7 +15,7 @@ class Day23Test :
         describe("part 2") {
             it("example case") { Day23.computePart2("2023/day23-example.txt").shouldBe(154) }
 
-            xit("real case") { Day23.computePart2("2023/day23-real.txt").shouldBe(0) }
+            it("real case") { Day23.computePart2("2023/day23-real.txt").shouldBe(0) }
             // 5018 too low
             // 6016 too low
         }
