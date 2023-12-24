@@ -12,6 +12,6 @@ object Day23 : Problem<Int> {
 
     override fun computePart2(inputFile: String): Int {
         val inputs = inputFile.readFileFromResource().to2DChars()
-        return WalkForestDFSPart2(inputs).compute()
+        return SimplifyBFS(inputs).compute()
     }
 }

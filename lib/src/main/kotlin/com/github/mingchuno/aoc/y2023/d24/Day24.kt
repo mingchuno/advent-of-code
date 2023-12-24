@@ -13,6 +13,7 @@ object Day24 {
 
     fun computePart2(inputFile: String): Int {
         val inputs = inputFile.readFileFromResource()
+        val hailstones = inputs.map { it.parseHailstone() }
         TODO("Not yet implemented")
     }
 }

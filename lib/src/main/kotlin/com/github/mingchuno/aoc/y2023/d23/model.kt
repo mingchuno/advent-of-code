@@ -79,58 +79,60 @@ class WalkForestBFSPart2(inputs: List<List<Char>>) : WalkForestBFSBase(inputs) {
     }
 }
 
+data class Neighbor(val coord: Coord, val toDirection: Direction)
+
+private data class MemoKey(val coord: Coord, val direction: Direction, val steps: Int)
+
 abstract class WalkForestDFS(private val inputs: List<List<Char>>) {
     private val X = inputs.first().size
     private val Y = inputs.size
     private val startPos: Coord = inputs.first().indexOfFirst { it == '.' } to 0
     private val endPos: Coord = inputs.last().indexOfFirst { it == '.' } to (Y - 1)
+    private val visited: MutableSet<Coord> = mutableSetOf()
+    private val memo = mutableMapOf<MemoKey, Int>()
 
     fun compute(): Int {
         return dfs(startPos, Direction.UP, 0)
+    }
+
+    private fun dfsMemo(coord: Coord, fromDirection: Direction, steps: Int): Int {
+        val key = MemoKey(coord, fromDirection, steps)
+        return memo[key] ?: dfs(coord, fromDirection, steps).also { memo[key] = it }
     }
 
     private fun dfs(coord: Coord, fromDirection: Direction, steps: Int): Int {
         if (coord == endPos) {
             return steps
         }
-        var stepsDelta = 1
-        var neighbors = findNeighbors(coord, fromDirection)
-        while (neighbors.size == 1) {
-            val (neig, nextDir) = neighbors.first()
-            neighbors = findNeighbors(neig, nextDir)
-            stepsDelta++
-        }
-        println("coord=$coord;fromDirection=$fromDirection;steps=$steps")
+        visited.add(coord)
+        val neighbors = findNeighbors(coord, fromDirection)
         return neighbors.maxOfOrNull { (neighbor, toDirection) ->
-            println("neighbor=$neighbor;toDirection=$toDirection;steps=${steps + stepsDelta}")
-            dfs(neighbor, toDirection, steps + stepsDelta)
+            dfsMemo(neighbor, toDirection, steps + 1).also { visited.remove(neighbor) }
         } ?: 0
     }
 
-    protected abstract fun findNeighbors(
-        coord: Coord,
-        fromDirection: Direction
-    ): List<Pair<Coord, Direction>>
+    abstract fun findNeighbors(coord: Coord, fromDirection: Direction): List<Neighbor>
 
     protected fun forValidCoord(
         x: Int,
         y: Int,
         fromDirection: Direction,
         toDirection: Direction
-    ): Pair<Coord, Direction>? {
+    ): Neighbor? {
         return if (
-            x in 0 ..< X && y in 0 ..< Y && inputs[y][x] != '#' && fromDirection != toDirection
-        )
-            (x to y) to toDirection.opposite()
-        else null
+            x in 0 ..< X &&
+                y in 0 ..< Y &&
+                inputs[y][x] != '#' &&
+                fromDirection != toDirection &&
+                !visited.contains(x to y)
+        ) {
+            Neighbor(x to y, toDirection.opposite())
+        } else null
     }
 }
 
 class WalkForestDFSPart1(private val inputs: List<List<Char>>) : WalkForestDFS(inputs) {
-    override fun findNeighbors(
-        coord: Coord,
-        fromDirection: Direction
-    ): List<Pair<Coord, Direction>> {
+    override fun findNeighbors(coord: Coord, fromDirection: Direction): List<Neighbor> {
         val (x, y) = coord
         return when (inputs[y][x]) {
             '.' -> {
@@ -151,10 +153,7 @@ class WalkForestDFSPart1(private val inputs: List<List<Char>>) : WalkForestDFS(i
 }
 
 class WalkForestDFSPart2(inputs: List<List<Char>>) : WalkForestDFS(inputs) {
-    override fun findNeighbors(
-        coord: Coord,
-        fromDirection: Direction
-    ): List<Pair<Coord, Direction>> {
+    override fun findNeighbors(coord: Coord, fromDirection: Direction): List<Neighbor> {
         val (x, y) = coord
         return listOfNotNull(
             forValidCoord(x, y - 1, fromDirection, Direction.UP),
