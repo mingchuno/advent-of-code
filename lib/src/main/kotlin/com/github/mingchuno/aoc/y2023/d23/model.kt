@@ -93,9 +93,17 @@ abstract class WalkForestDFS(private val inputs: List<List<Char>>) {
         if (coord == endPos) {
             return steps
         }
-        val neighbors = findNeighbors(coord, fromDirection)
+        var stepsDelta = 1
+        var neighbors = findNeighbors(coord, fromDirection)
+        while (neighbors.size == 1) {
+            val (neig, nextDir) = neighbors.first()
+            neighbors = findNeighbors(neig, nextDir)
+            stepsDelta++
+        }
+        println("coord=$coord;fromDirection=$fromDirection;steps=$steps")
         return neighbors.maxOfOrNull { (neighbor, toDirection) ->
-            dfs(neighbor, toDirection, steps + 1)
+            println("neighbor=$neighbor;toDirection=$toDirection;steps=${steps + stepsDelta}")
+            dfs(neighbor, toDirection, steps + stepsDelta)
         } ?: 0
     }
 
