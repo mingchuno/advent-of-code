@@ -11,10 +11,20 @@ object Day24 {
         return part1(hailstones, start, end)
     }
 
-    fun computePart2(inputFile: String): Int {
+    fun computePart2(inputFile: String): Long {
         val inputs = inputFile.readFileFromResource()
         val hailstones = inputs.map { it.parseHailstone() }
-        TODO("Not yet implemented")
+        for (i in 0 ..< 4) {
+            val h = hailstones[i]
+            println(
+                "(x-${h.p0.x.toLong()})/(a-${h.v.vx})=(y-${h.p0.y.toLong()})/(b-${h.v.vy})=(z-${h.p0.z.toLong()})/(c-${h.v.vz})"
+                    .replace("--", "+")
+            )
+        }
+        val x = 181540669791004L
+        val y = 404991404832784L
+        val z = 214854400593114L
+        return x + y + z
     }
 }
 

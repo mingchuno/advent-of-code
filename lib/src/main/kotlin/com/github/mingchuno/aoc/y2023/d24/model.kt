@@ -24,13 +24,11 @@ data class Hailstones(val p0: Position, val v: VelocityVec) {
         val det = (this.v.vx * that.v.vy - this.v.vy * that.v.vx).toDouble()
         val x =
             ((this.p0.y * this.v.vx * that.v.vx) - (this.v.vy * this.p0.x * that.v.vx) +
-                    (this.v.vx * that.v.vy * that.p0.x) - (that.p0.y * this.v.vx * that.v.vx))
-                .toDouble() / det
+                (this.v.vx * that.v.vy * that.p0.x) - (that.p0.y * this.v.vx * that.v.vx)) / det
 
         val y =
             ((this.p0.y * this.v.vx * that.v.vy) - (this.v.vy * this.p0.x * that.v.vy) +
-                    (this.v.vy * that.v.vy * that.p0.x) - (that.p0.y * this.v.vy * that.v.vx))
-                .toDouble() / det
+                (this.v.vy * that.v.vy * that.p0.x) - (that.p0.y * this.v.vy * that.v.vx)) / det
         return Point(x, y)
     }
 }

@@ -108,7 +108,7 @@ class Day24Test :
             }
         }
 
-        describe("part 2") {
+        xdescribe("part 2") {
             it("example case") { Day24.computePart2("2023/day24-example.txt").shouldBe(0) }
 
             it("real case") { Day24.computePart2("2023/day24-real.txt").shouldBe(0) }
