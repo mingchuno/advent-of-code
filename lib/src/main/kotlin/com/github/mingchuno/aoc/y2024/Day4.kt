@@ -89,7 +89,34 @@ object Day4 : Problem<Int> {
     }
 
     override fun computePart2(inputFile: String): Int {
-        val inputs = inputFile.readFileFromResource()
-        return 0
+        val inputs = inputFile.readFileFromResource().to2DChars()
+        var count = 0
+        inputs.forEachIndexed { y, row ->
+            row.forEachIndexed { x, c ->
+                if (c == 'A') {
+                    //
+                    val pattern1 =
+                        inputs.getOrNull(y - 1)?.getOrNull(x - 1) == 'M' &&
+                            inputs.getOrNull(y + 1)?.getOrNull(x + 1) == 'S'
+                    val pattern2 =
+                        inputs.getOrNull(y - 1)?.getOrNull(x - 1) == 'S' &&
+                            inputs.getOrNull(y + 1)?.getOrNull(x + 1) == 'M'
+
+                    val pattern3 =
+                        inputs.getOrNull(y - 1)?.getOrNull(x + 1) == 'M' &&
+                            inputs.getOrNull(y + 1)?.getOrNull(x - 1) == 'S'
+
+                    val pattern4 =
+                        inputs.getOrNull(y - 1)?.getOrNull(x + 1) == 'S' &&
+                            inputs.getOrNull(y + 1)?.getOrNull(x - 1) == 'M'
+
+                    val isX = (pattern1 || pattern2) && (pattern3 || pattern4)
+                    if (isX) {
+                        count++
+                    }
+                }
+            }
+        }
+        return count
     }
 }

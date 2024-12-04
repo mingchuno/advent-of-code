@@ -12,8 +12,8 @@ class Day4Test :
         }
 
         describe("part 2") {
-            it("example case") { Day4.computePart2("2024/day4_example_2.txt").shouldBe(48) }
+            it("example case") { Day4.computePart2("2024/day4_example.txt").shouldBe(9) }
 
-            it("real case") { Day4.computePart2("2024/day4_input.txt").shouldBe(102467299) }
+            it("real case") { Day4.computePart2("2024/day4_input.txt").shouldBe(1960) }
         }
     })
