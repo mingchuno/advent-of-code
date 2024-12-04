@@ -3,7 +3,6 @@ package com.github.mingchuno.aoc.y2024
 import com.github.mingchuno.aoc.interfaceing.Problem
 import com.github.mingchuno.aoc.utils.parseInts
 import com.github.mingchuno.aoc.utils.readFileFromResource
-import kotlin.math.abs
 
 object Day2 : Problem<Int> {
 
@@ -13,22 +12,9 @@ object Day2 : Problem<Int> {
     }
 
     private fun part1IsSafe(report: List<Int>): Boolean {
-        println("Running part1IsSafe for:$report")
-        val stack = ArrayDeque<Int>()
-        val isDesc = report.first() > report.last()
-        report.forEach { current ->
-            val shouldPush =
-                stack.firstOrNull()?.let { prev ->
-                    val isMonotonic = if (isDesc) prev > current else current > prev
-                    val diff = abs(prev - current)
-                    val isLevelDiffOk = diff in 1..3
-                    isMonotonic && isLevelDiffOk
-                } ?: true
-            if (shouldPush) {
-                stack.addFirst(current)
-            }
-        }
-        return stack.size == report.size
+        val diff = report.zipWithNext { a, b -> a - b }
+        val isSafe = diff.all { it in 1..3 } || diff.all { it in -3..-1 }
+        return isSafe
     }
 
     override fun computePart2(inputFile: String): Int {
