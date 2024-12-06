@@ -12,8 +12,8 @@ class Day6Test :
         }
 
         describe("part 2") {
-            it("example case") { Day6.computePart2("2024/day6_example.txt").shouldBe(0) }
+            it("example case") { Day6.computePart2("2024/day6_example.txt").shouldBe(6) }
 
-            it("real case") { Day6.computePart2("2024/day6_input.txt").shouldBe(0) }
+            it("real case") { Day6.computePart2("2024/day6_input.txt").shouldBe(1705) }
         }
     })
