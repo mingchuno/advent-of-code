@@ -3,7 +3,7 @@ package com.github.mingchuno.aoc.y2024
 import com.github.mingchuno.aoc.interfaceing.Problem
 import com.github.mingchuno.aoc.utils.readFileFromResource
 import com.github.mingchuno.aoc.utils.to2DChars
-import com.github.mingchuno.aoc.utils.transpose
+import com.github.mingchuno.aoc.utils.toMaze
 
 object Day4 : Problem<Int> {
 
@@ -11,77 +11,28 @@ object Day4 : Problem<Int> {
 
     override fun computePart1(inputFile: String): Int {
         val inputs = inputFile.readFileFromResource().to2DChars()
-        val inputsT = inputs.transpose()
-        val Y = inputs.size
-        val X = inputs.first().size
+        val maze = inputs.toMaze()
         var count = 0
         inputs.forEachIndexed { y, row ->
             row.forEachIndexed { x, c ->
                 if (c == 'X') {
+                    maze.setCurrentPos(x, y)
                     // right direction
-                    if (row.subList(x, (x + 4).coerceAtMost(X)).isXmas()) {
-                        count++
-                    }
+                    if ((0..3).mapNotNull { maze.walkRight(it) }.isXmas()) count++
                     // left direction
-                    if (row.slice((x - 3).coerceAtLeast(0)..x).reversed().isXmas()) {
-                        count++
-                    }
+                    if ((0..3).mapNotNull { maze.walkLeft(it) }.isXmas()) count++
                     // down direction
-                    if (inputsT[x].subList(y, (y + 4).coerceAtMost(Y)).isXmas()) {
-                        count++
-                    }
+                    if ((0..3).mapNotNull { maze.walkDown(it) }.isXmas()) count++
                     // up direction
-                    if (inputsT[x].slice((y - 3).coerceAtLeast(0)..y).reversed().isXmas()) {
-                        count++
-                    }
+                    if ((0..3).mapNotNull { maze.walkUp(it) }.isXmas()) count++
                     // NE direction
-                    if (
-                        listOfNotNull(
-                                'X',
-                                inputs.getOrNull(y - 1)?.getOrNull(x + 1),
-                                inputs.getOrNull(y - 2)?.getOrNull(x + 2),
-                                inputs.getOrNull(y - 3)?.getOrNull(x + 3),
-                            )
-                            .isXmas()
-                    ) {
-                        count++
-                    }
+                    if ((0..3).mapNotNull { maze.walkTopRight(it) }.isXmas()) count++
                     // SE direction
-                    if (
-                        listOfNotNull(
-                                'X',
-                                inputs.getOrNull(y + 1)?.getOrNull(x + 1),
-                                inputs.getOrNull(y + 2)?.getOrNull(x + 2),
-                                inputs.getOrNull(y + 3)?.getOrNull(x + 3),
-                            )
-                            .isXmas()
-                    ) {
-                        count++
-                    }
+                    if ((0..3).mapNotNull { maze.walkBottomRight(it) }.isXmas()) count++
                     // SW direction
-                    if (
-                        listOfNotNull(
-                                'X',
-                                inputs.getOrNull(y + 1)?.getOrNull(x - 1),
-                                inputs.getOrNull(y + 2)?.getOrNull(x - 2),
-                                inputs.getOrNull(y + 3)?.getOrNull(x - 3),
-                            )
-                            .isXmas()
-                    ) {
-                        count++
-                    }
+                    if ((0..3).mapNotNull { maze.walkBottomLeft(it) }.isXmas()) count++
                     // NW direction
-                    if (
-                        listOfNotNull(
-                                'X',
-                                inputs.getOrNull(y - 1)?.getOrNull(x - 1),
-                                inputs.getOrNull(y - 2)?.getOrNull(x - 2),
-                                inputs.getOrNull(y - 3)?.getOrNull(x - 3),
-                            )
-                            .isXmas()
-                    ) {
-                        count++
-                    }
+                    if ((0..3).mapNotNull { maze.walkTopLeft(it) }.isXmas()) count++
                 }
             }
         }
@@ -90,26 +41,16 @@ object Day4 : Problem<Int> {
 
     override fun computePart2(inputFile: String): Int {
         val inputs = inputFile.readFileFromResource().to2DChars()
+        val maze = inputs.toMaze()
         var count = 0
         inputs.forEachIndexed { y, row ->
             row.forEachIndexed { x, c ->
                 if (c == 'A') {
-                    //
-                    val pattern1 =
-                        inputs.getOrNull(y - 1)?.getOrNull(x - 1) == 'M' &&
-                            inputs.getOrNull(y + 1)?.getOrNull(x + 1) == 'S'
-                    val pattern2 =
-                        inputs.getOrNull(y - 1)?.getOrNull(x - 1) == 'S' &&
-                            inputs.getOrNull(y + 1)?.getOrNull(x + 1) == 'M'
-
-                    val pattern3 =
-                        inputs.getOrNull(y - 1)?.getOrNull(x + 1) == 'M' &&
-                            inputs.getOrNull(y + 1)?.getOrNull(x - 1) == 'S'
-
-                    val pattern4 =
-                        inputs.getOrNull(y - 1)?.getOrNull(x + 1) == 'S' &&
-                            inputs.getOrNull(y + 1)?.getOrNull(x - 1) == 'M'
-
+                    maze.setCurrentPos(x, y)
+                    val pattern1 = maze.walkTopLeft(1) == 'M' && maze.walkBottomRight(1) == 'S'
+                    val pattern2 = maze.walkTopLeft(1) == 'S' && maze.walkBottomRight(1) == 'M'
+                    val pattern3 = maze.walkTopRight(1) == 'M' && maze.walkBottomLeft(1) == 'S'
+                    val pattern4 = maze.walkTopRight(1) == 'S' && maze.walkBottomLeft(1) == 'M'
                     val isX = (pattern1 || pattern2) && (pattern3 || pattern4)
                     if (isX) {
                         count++

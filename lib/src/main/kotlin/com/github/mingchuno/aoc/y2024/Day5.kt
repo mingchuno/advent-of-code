@@ -24,16 +24,7 @@ object Day5 : Problem<Int> {
         input.updates.forEach { update ->
             val valid = input.isUpdateValid(update)
             if (!valid) {
-                val updateSet = update.toSet()
-                sum +=
-                    update
-                        .sortedWith { a, b ->
-                            val scoreA =
-                                input.rules.getOrDefault(a, setOf()).intersect(updateSet).size
-                            val scoreB =
-                                input.rules.getOrDefault(b, setOf()).intersect(updateSet).size
-                            scoreA - scoreB
-                        }[update.size / 2]
+                sum += input.sortInvalidAndGetScore(update)
             }
         }
         return sum
@@ -75,5 +66,15 @@ private data class Input(val rules: Map<Int, Set<Int>>, val updates: List<List<I
             }
         }
         return valid
+    }
+
+    fun sortInvalidAndGetScore(update: List<Int>): Int {
+        val updateSet = update.toSet()
+        return update
+            .sortedWith { a, b ->
+                val scoreA = rules.getOrDefault(a, setOf()).intersect(updateSet).size
+                val scoreB = rules.getOrDefault(b, setOf()).intersect(updateSet).size
+                scoreA - scoreB
+            }[update.size / 2]
     }
 }
