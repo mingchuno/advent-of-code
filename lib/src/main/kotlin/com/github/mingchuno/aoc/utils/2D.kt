@@ -9,11 +9,40 @@ fun Coord.atOrigin(): Boolean {
     return x == 0 && y == 0
 }
 
+fun Coord.toString(): String = "x=${first},y=${second}"
+
 enum class Direction {
     UP,
     DOWN,
     LEFT,
     RIGHT,
+}
+
+fun Char.direction(): Direction =
+    when (this) {
+        '^' -> Direction.UP
+        '>' -> Direction.RIGHT
+        '<' -> Direction.LEFT
+        'v' -> Direction.DOWN
+        else -> throw ThisShouldNotHappenException()
+    }
+
+fun Direction.turnRight(): Direction {
+    return when (this) {
+        Direction.UP -> Direction.RIGHT
+        Direction.DOWN -> Direction.LEFT
+        Direction.LEFT -> Direction.UP
+        Direction.RIGHT -> Direction.DOWN
+    }
+}
+
+fun Direction.turnLeft(): Direction {
+    return when (this) {
+        Direction.UP -> Direction.LEFT
+        Direction.DOWN -> Direction.RIGHT
+        Direction.LEFT -> Direction.DOWN
+        Direction.RIGHT -> Direction.UP
+    }
 }
 
 fun Direction.opposite(): Direction {
@@ -37,35 +66,65 @@ class Maze(val inputs: List<List<Char>>) {
         currentPosY = y
     }
 
-    fun walkUp(step: Int): Char? {
-        return inputs.getOrNull(currentPosY - step)?.getOrNull(currentPosX)
+    fun setCurrentPos(coord: Coord) {
+        val (x, y) = coord
+        setCurrentPos(x, y)
     }
 
-    fun walkDown(step: Int): Char? {
-        return inputs.getOrNull(currentPosY + step)?.getOrNull(currentPosX)
+    val currentPos: Coord
+        get() = Pair(currentPosX, currentPosY)
+
+    fun findStartingPos(vararg chars: Char): Coord? {
+        val yRange = inputs.indices
+        val xRange = inputs[0].indices
+        val charSet = chars.toSet()
+        for (y in yRange) {
+            for (x in xRange) {
+                if (charSet.contains(inputs[y][x])) {
+                    return Pair(x, y)
+                }
+            }
+        }
+        return null // Not found
     }
 
-    fun walkLeft(step: Int): Char? {
-        return inputs.getOrNull(currentPosY)?.getOrNull(currentPosX - step)
-    }
+    val currentCell: Char
+        get() = inputs[currentPosY][currentPosX]
 
-    fun walkRight(step: Int): Char? {
-        return inputs.getOrNull(currentPosY)?.getOrNull(currentPosX + step)
-    }
+    fun checkUp(step: Int): Char? = walkUp(step)?.cell
 
-    fun walkTopRight(step: Int): Char? {
-        return inputs.getOrNull(currentPosY - step)?.getOrNull(currentPosX + step)
-    }
+    fun checkDown(step: Int): Char? = walkDown(step)?.cell
 
-    fun walkTopLeft(step: Int): Char? {
-        return inputs.getOrNull(currentPosY - step)?.getOrNull(currentPosX - step)
-    }
+    fun checkLeft(step: Int): Char? = walkLeft(step)?.cell
 
-    fun walkBottomRight(step: Int): Char? {
-        return inputs.getOrNull(currentPosY + step)?.getOrNull(currentPosX + step)
-    }
+    fun checkRight(step: Int): Char? = walkRight(step)?.cell
 
-    fun walkBottomLeft(step: Int): Char? {
-        return inputs.getOrNull(currentPosY + step)?.getOrNull(currentPosX - step)
-    }
+    fun checkTopRight(step: Int): Char? = walkTopRight(step)?.cell
+
+    fun checkTopLeft(step: Int): Char? = walkTopLeft(step)?.cell
+
+    fun checkBottomRight(step: Int): Char? = walkBottomRight(step)?.cell
+
+    fun checkBottomLeft(step: Int): Char? = walkBottomLeft(step)?.cell
+
+    fun walkUp(step: Int): NextCell? = walkGeneric(currentPosX, currentPosY - step)
+
+    fun walkDown(step: Int): NextCell? = walkGeneric(currentPosX, currentPosY + step)
+
+    fun walkLeft(step: Int): NextCell? = walkGeneric(currentPosX - step, currentPosY)
+
+    fun walkRight(step: Int): NextCell? = walkGeneric(currentPosX + step, currentPosY)
+
+    fun walkTopRight(step: Int): NextCell? = walkGeneric(currentPosX + step, currentPosY - step)
+
+    fun walkTopLeft(step: Int): NextCell? = walkGeneric(currentPosX - step, currentPosY - step)
+
+    fun walkBottomRight(step: Int): NextCell? = walkGeneric(currentPosX + step, currentPosY + step)
+
+    fun walkBottomLeft(step: Int): NextCell? = walkGeneric(currentPosX - step, currentPosY + step)
+
+    private fun walkGeneric(newX: Int, newY: Int): NextCell? =
+        inputs.getOrNull(newY)?.getOrNull(newX)?.let { NextCell(newX, newY, it) }
+
+    data class NextCell(val x: Int, val y: Int, val cell: Char)
 }
