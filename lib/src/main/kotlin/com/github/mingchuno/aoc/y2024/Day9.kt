@@ -59,7 +59,7 @@ object Day9 : Problem<Long> {
         private val freeSpaceLookup: MutableList<Block> = mutableListOf()
         private val dataBlockLookup: MutableList<Block> = mutableListOf()
 
-        private data class Block(var start: Int, var end: Int) {
+        private data class Block(var start: Int, val end: Int) {
             val size
                 get() = end - start
         }

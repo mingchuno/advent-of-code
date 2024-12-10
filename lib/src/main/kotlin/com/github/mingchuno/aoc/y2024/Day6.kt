@@ -15,7 +15,7 @@ object Day6 : Problem<Int> {
         val pos = maze.findStartingPos('^', '>', '<', 'v')!!
         maze.setCurrentPos(pos)
         var direction = maze.currentCell.direction()
-        var next: Maze.NextCell?
+        var next: Maze.NextCell<Char>?
 
         // Start walking
         do {
@@ -54,7 +54,7 @@ object Day6 : Problem<Int> {
                 // Reset state
                 maze.setCurrentPos(startPos)
                 var direction = maze.currentCell.direction()
-                var next: Maze.NextCell?
+                var next: Maze.NextCell<Char>?
                 val visited = mutableSetOf<Pair<Coord, Direction>>()
 
                 loop@ do {
