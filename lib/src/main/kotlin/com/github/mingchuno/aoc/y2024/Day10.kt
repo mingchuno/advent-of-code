@@ -48,6 +48,41 @@ object Day10 : Problem<Int> {
 
     override fun computePart2(inputFile: String): Int {
         val maze = inputFile.readFileFromResource().to2DChars().toIntMaze()
-        return 0
+        val c = ComputePart2(maze)
+        return c.computeRating()
+    }
+
+    private class ComputePart2(val maze: Maze<Int>) {
+        fun dfs(pos: Coord, height: Int): Int {
+            return if (height == 9) {
+                1
+            } else {
+                val nextHeight = height + 1
+                maze.setCurrentPos(pos)
+                val up = maze.walkUp(1)
+                val down = maze.walkDown(1)
+                val left = maze.walkLeft(1)
+                val right = maze.walkRight(1)
+                up.walk(nextHeight) +
+                    down.walk(nextHeight) +
+                    left.walk(nextHeight) +
+                    right.walk(nextHeight)
+            }
+        }
+
+        private fun Maze.NextCell<Int>?.walk(nextHeight: Int): Int =
+            this?.takeIf { it.cell == nextHeight }?.let { dfs(it.pos, nextHeight) } ?: 0
+
+        fun computeRating(): Int {
+            return maze.inputs
+                .mapIndexed { y, rows ->
+                    rows
+                        .mapIndexed { x, height ->
+                            if (height == 0) dfs(Coord(x, y), height) else 0
+                        }
+                        .sum()
+                }
+                .sum()
+        }
     }
 }

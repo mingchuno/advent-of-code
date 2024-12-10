@@ -12,8 +12,8 @@ class Day10Test :
         }
 
         describe("part 2") {
-            it("example case") { Day10.computePart2("2024/day10_example.txt").shouldBe(2858) }
+            it("example case") { Day10.computePart2("2024/day10_example.txt").shouldBe(81) }
 
-            it("real case") { Day10.computePart2("2024/day10_input.txt").shouldBe(6381624803796L) }
+            it("real case") { Day10.computePart2("2024/day10_input.txt").shouldBe(1225) }
         }
     })
